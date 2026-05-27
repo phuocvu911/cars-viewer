@@ -11,6 +11,13 @@ At any time you can change the port to whatever you want, see [Instructions](##I
 make build
 ```
 
+## NOTE 
+The computers at Hive has Node pre-installed. You can simply use:
+
+```bash
+node main.js
+```
+
 ## Instructions
 
 To run the server you need simply to execute the following command:
