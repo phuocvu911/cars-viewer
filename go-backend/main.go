@@ -40,6 +40,7 @@ type CarModel struct {
 	Image          string         `json:"image"`
 }
 
+// unifies add tables
 type EnrichedCarModel struct {
 	CarModel
 	ManufacturerName    string
