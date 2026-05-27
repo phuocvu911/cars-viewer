@@ -1,9 +1,43 @@
-// Header 
+{{ define "base" }}
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoVault</title>
+    <meta name="description" content="Explore, compare, and discover the world's finest automobiles.">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
 
+<body>
+    {{ template "nav" . }}
+    {{ template "content" . }}
+    {{ template "footer" . }}
+</body>
 
-// body content or 404 etc 
+</html>
+{{ end }}
 
+{{ define "nav" }}
+<nav id="main-nav" class="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-logo"><span class="logo-icon">◈</span><span class="logo-text">Auto<span
+                    class="logo-accent">Vault</span></span></a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/gallery">Gallery</a>
+            <a href="/compare">Compare</a>
+            <a href="/recommend">For You</a>
+        </div>
+    </div>
+</nav>
+{{ end }}
 
-
-// footer 
+{{ define "footer" }}
+<footer class="footer">
+    <div class="footer-content">
+        <p class="footer-copyright">© 2026 AutoVault. Built with Go. Developed by Hoang & Markus.</p>
+    </div>
+</footer>
+{{ end }}
