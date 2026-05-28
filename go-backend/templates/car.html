@@ -1,27 +1,22 @@
 {{ define "content" }}
-
-
 <div id="car-div" class="main-content">
 
-    <h2 id="content-header">{{.MakeModel}}  {{.Year}} </h2>
+    <h2 id="content-header">{{.DataPerID.MakeModel}} {{.DataPerID.Year}} </h2>
 
-    <img src="{{.ImageSource}}"> 
+    <img src="{{.DataPerID.ImgSrc}}" alt="Picture of a car" width="95%"> 
 
     <ul id="specifications">
-
         <h2>Specifications</h2>
-        <h3>Engine: {{.Engine}}</h3>
-        <h3>Horsepower: {{.EngineHP}}</h3>
-        <h3>Transmission: {{.Transmission}}</h3>
-        <h3>Drivetrain: {{.Drivetrain}}</h3>
+        <h3>Engine: {{.DataPerID.TechnicalDetails.Engine}}</h3>
+        <h3>Horsepower: {{.DataPerID.TechnicalDetails.Horsepower}}</h3>
+        <h3>Transmission: {{.DataPerID.TechnicalDetails.Transmission}}</h3>
+        <h3>Drivetrain: {{.DataPerID.TechnicalDetails.Drivetrain}}</h3>
     </ul>
 
     <ul id="about-manufacturer">
-        <h2>About {{.Make}}</h2>
-        <h3>{{.Make}} was founded in {{.CountryOfOrigin}} in {{.FoundingYear}}</h3>
+        <h2>About {{.ManufactDetails.Make}}</h2>
+        <h3>{{.ManufactDetails.Make}} was founded in {{.ManufactDetails.CountryOfOrigin}} in {{.ManufactDetails.FoundingYear}}</h3>
     </ul>
    
 </div>
-
-
 {{end}}
