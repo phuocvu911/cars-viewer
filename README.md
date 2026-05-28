@@ -1,4 +1,10 @@
+# Run project from root 
 
+```bash 
+go run run.go 
+```
+
+It is a startup script for the JS server as well as the go program. If either fails, the project will shut down. 
 
 # Use branches 
 
@@ -11,3 +17,6 @@ Hoang does the :8080/ root and Markus does /car/{id} page.
 after we add 
 - option for selecting recommendations based on GET /api/categories
 - /compare 
+
+
+# Run the project 
