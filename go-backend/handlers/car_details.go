@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
@@ -13,7 +14,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	car_id := r.URL.Path[len("/car/"):]
 
-	if len(car_id) == 0 || len(car_id) < 10 {
+	if len(car_id) == 0 || len(car_id) > 10 {
 		http.Error(w, "Bad request.", http.StatusBadRequest)
 		return
 	}
@@ -29,6 +30,13 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	return
+	w.Header().Set("Content-Type", "application/json")
+
+	err := json.NewEncoder(w).Encode(car)
+
+	if err != nil {
+		http.Error(w, "Failed to encode Car object into JSON: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 }
