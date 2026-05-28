@@ -1,9 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
+	"html/template"
 	"net/http"
 )
+
+var tmpl, _ = template.ParseFiles("./templates/index.html", "./templates/home.html", "./templates/navfooter.html", "./templates/car.html")
 
 func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -30,12 +32,12 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
 
-	err := json.NewEncoder(w).Encode(car)
+	err := tmpl.ExecuteTemplate(w, "index.html", car)
 
 	if err != nil {
-		http.Error(w, "Failed to encode Car object into JSON: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to execute template: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
