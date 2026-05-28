@@ -27,19 +27,23 @@ type Manufacturer struct {
 	FoundingYear    int    `json:"foundingYear"`
 }
 
+type TechnicalDetails struct {
+	Engine       string `json:"engine"`
+	Horsepower   int    `json:"horsepower"`
+	Transmission string `json:"transmission"`
+	Drivetrain   string `json:"drivetrain"`
+}
+
 // Access via /api/models/{id}
 type CarSpecs struct {
 	CarID           int `json:"id"`             // The cars own individual unique id
 	ManufactrurerID int `json:"manufacturerId"` // Holds data to the car manufacturer
 	CategoryID      int `json:"categoryId"`
 
-	MakeModel    string `json:"name"` // e.g. "Audi Q5"
-	Year         int    `json:"year"`
-	Engine       string `json:"specifications.engine"`
-	EngineHP     string `json:"specifications.horsepower"`
-	Transmission string `json:"specifications.transmission"`
-	Drivetrain   string `json:"specifications.drivetrain"`
-	ImgSrc       string `json:"image"`
+	MakeModel        string `json:"name"` // e.g. "Audi Q5"
+	Year             int    `json:"year"`
+	TechnicalDetails TechnicalDetails
+	ImgSrc           string `json:"image"`
 }
 
 func FetchDataFromAPIByRouteAndID(route string, id int, DataModel any) error {
@@ -90,4 +94,6 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 		errChan <- err
 		return
 	}
+
+	errChan <- nil
 }
