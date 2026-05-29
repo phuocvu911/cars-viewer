@@ -9,6 +9,10 @@ import (
 )
 
 const (
+	// GO ENDPOINTS
+	CARS_ENDPOINT string = "/cars/"
+
+	// ROUTES FOR THE JS API
 	API_BASE_URL         string = "http://localhost:3000"
 	MODELS_ROUTE         string = "/api/models/"
 	MANUFACTURER_ROUTE   string = "/api/manufacturers/"
@@ -17,6 +21,7 @@ const (
 	ALL_CATEGORIES_ROUTE string = "/api/categories"
 
 	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
+
 )
 
 // Global store for all models and categories
@@ -46,6 +51,7 @@ type Category struct {
 type Car struct {
 	DataPerID       CarSpecs
 	ManufactDetails Manufacturer
+	Category        Category
 }
 
 // Access via /api/manufacturers/{id}
@@ -99,9 +105,9 @@ func FetchDataFromAPIByRouteAndID(route string, id int, DataModel any) error {
 	return nil
 }
 
-// Use to fetch all related information to Car page.
-// Second request needs manufacturer id so it cannot be concurrent
-func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
+// Use to fetch Car by id.
+// Basically fetch CarSpecs struct.
+func FetchCarByID(car_id string, errChan chan<- error, carpointer *Car) {
 
 	int_id, err := strconv.Atoi(car_id)
 
@@ -116,8 +122,18 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 		errChan <- err
 		return
 	}
+	// Add nil to the channel to confirm all went smoothly
+	errChan <- nil
+}
 
-	err = FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
+
+	if carpointer.DataPerID.ManufactrurerID < 1 {
+		errChan <- errors.New("Manufactrurer ID has not been assigned or is invalid. ")
+		return
+	}
+
+	err := FetchDataFromAPIByRouteAndID(CATEGORIES_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
@@ -125,6 +141,24 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 	}
 
 	errChan <- nil
+
+}
+
+func FetchCarCategory(errChan chan<- error, carpointer *Car) {
+
+	if carpointer.DataPerID.CategoryID < 1 {
+		errChan <- errors.New("Category ID has not been assigned or is invalid. ")
+	}
+
+	err := FetchDataFromAPIByRouteAndID(CATEGORIES_ROUTE, carpointer.DataPerID.CategoryID, &carpointer.Category)
+
+	if err != nil {
+		errChan <- err
+		return
+	}
+
+	errChan <- nil
+
 }
 
 // Initialize the store by fetching all models and categories
