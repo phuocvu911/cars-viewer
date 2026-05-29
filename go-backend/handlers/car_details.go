@@ -16,6 +16,10 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	c, _ := r.Cookie("id")
+
+	fmt.Println(c)
+
 	car_id := r.URL.Path[len(CARS_ENDPOINT):]
 
 	if len(car_id) == 0 || len(car_id) > 10 {
@@ -35,7 +39,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
-	fmt.Println(car)
+
 	var wg sync.WaitGroup
 	errChannel = make(chan error, 2)
 
@@ -54,6 +58,8 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Add("Set-Cookie", "id="+GenerateCookie(5)+"; Max-Age=2592000")
 
 	// Execute template
 	err := tmpl.ExecuteTemplate(w, "index.html", car)
