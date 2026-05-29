@@ -49,6 +49,7 @@ type Car struct {
 	DataPerID       CarSpecs
 	ManufactDetails Manufacturer
 	Page            string
+	Category        Category
 }
 
 // Access via /api/manufacturers/{id}
@@ -102,9 +103,9 @@ func FetchDataFromAPIByRouteAndID(route string, id int, DataModel any) error {
 	return nil
 }
 
-// Use to fetch all related information to Car page.
-// Second request needs manufacturer id so it cannot be concurrent
-func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
+// Use to fetch Car by id.
+// Basically fetch CarSpecs struct.
+func FetchCarByID(car_id string, errChan chan<- error, carpointer *Car) {
 
 	int_id, err := strconv.Atoi(car_id)
 
@@ -119,8 +120,19 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 		errChan <- err
 		return
 	}
+	// Add nil to the channel to confirm all went smoothly
+	errChan <- nil
+}
 
-	err = FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+	err := FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
+
+	if carpointer.DataPerID.ManufactrurerID < 1 {
+		errChan <- errors.New("Manufactrurer ID has not been assigned or is invalid. ")
+		return
+	}
+
+	err := FetchDataFromAPIByRouteAndID(CATEGORIES_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
@@ -128,6 +140,24 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 	}
 
 	errChan <- nil
+
+}
+
+func FetchCarCategory(errChan chan<- error, carpointer *Car) {
+
+	if carpointer.DataPerID.CategoryID < 1 {
+		errChan <- errors.New("Category ID has not been assigned or is invalid. ")
+	}
+
+	err := FetchDataFromAPIByRouteAndID(CATEGORIES_ROUTE, carpointer.DataPerID.CategoryID, &carpointer.Category)
+
+	if err != nil {
+		errChan <- err
+		return
+	}
+
+	errChan <- nil
+
 }
 
 // RWMutex: multiple readers can read simultaneously, but a writer gets exclusive access for lock and unlock

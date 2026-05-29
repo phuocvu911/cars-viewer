@@ -11,7 +11,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	car_id := r.URL.Path[len("/car/"):]
+	car_id := r.URL.Path[len(CARS_ENDPOINT):]
 
 	if len(car_id) == 0 || len(car_id) > 10 {
 		http.Error(w, "Bad request.", http.StatusBadRequest)
@@ -22,7 +22,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	errChannel := make(chan error, 1)
 
-	go FetchCar(car_id, errChannel, &car)
+	FetchCarByID(car_id, errChannel, &car)
 
 	if err := <-errChannel; err != nil {
 		http.Error(w, "Failed to fetch backend data: "+err.Error(), http.StatusInternalServerError)
