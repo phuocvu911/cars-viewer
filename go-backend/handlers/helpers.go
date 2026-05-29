@@ -196,12 +196,11 @@ func enrichAll() []EnrichedCarModel {
 }
 
 // Render a template with the given data
-func render(w http.ResponseWriter, templateName string, data interface{}) error {
+func render(w http.ResponseWriter, templateName string, data any) error {
 	tmpl, err := template.ParseFiles(
 		"./templates/index.html",
-		"./templates/home.html",
 		"./templates/navfooter.html",
-		"./templates/compare.html",
+		"./templates/"+templateName,
 	)
 	if err != nil {
 		return err
