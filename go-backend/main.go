@@ -18,12 +18,13 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.HomeHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
+	mux.HandleFunc("GET "+handlers.CARS_ENDPOINT, handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
 
 	// Proxy image requests to localhost:3000
 	remoteURL, _ := url.Parse(handlers.API_BASE_URL)
 	proxy := httputil.NewSingleHostReverseProxy(remoteURL)
-	mux.HandleFunc("/api/images/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /api/images/", func(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
 	})
 	log.Println("AutoVault ready to see at http://localhost:8080/")
