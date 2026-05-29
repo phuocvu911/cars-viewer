@@ -3,17 +3,44 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"html/template"
 	"net/http"
 	"strconv"
 )
 
 const (
-	API_BASE_URL       string = "http://localhost:3000"
-	MODELS_ROUTE       string = "/api/models/"
-	MANUFACTURER_ROUTE string = "/api/manufacturers/"
+	API_BASE_URL         string = "http://localhost:3000"
+	MODELS_ROUTE         string = "/api/models/"
+	MANUFACTURER_ROUTE   string = "/api/manufacturers/"
+	CATEGORIES_ROUTE     string = "/api/categories/"
+	ALL_MODELS_ROUTE     string = "/api/models"
+	ALL_CATEGORIES_ROUTE string = "/api/categories"
 
 	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
+
+// Global store for all models and categories
+type Store struct {
+	CarModels  []CarModel
+	Categories map[int]string // categoryID -> categoryName
+}
+
+var store Store
+
+type CarModel struct {
+	ID             int              `json:"id"`
+	Name           string           `json:"name"`
+	ManufacturerID int              `json:"manufacturerId"`
+	CategoryID     int              `json:"categoryId"`
+	Year           int              `json:"year"`
+	Image          string           `json:"image"`
+	Specifications TechnicalDetails `json:"specifications"`
+}
+
+type Category struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
 
 // DATA STRUCTS
 type Car struct {
@@ -98,4 +125,87 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 	}
 
 	errChan <- nil
+}
+
+// Initialize the store by fetching all models and categories
+func InitStore() error {
+	// Fetch all car models
+	res, err := http.Get(API_BASE_URL + ALL_MODELS_ROUTE)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return errors.New("failed to fetch models: status code " + strconv.Itoa(res.StatusCode))
+	}
+
+	err = json.NewDecoder(res.Body).Decode(&store.CarModels)
+	if err != nil {
+		return err
+	}
+
+	// Fetch all categories
+	store.Categories = make(map[int]string)
+	res, err = http.Get(API_BASE_URL + ALL_CATEGORIES_ROUTE)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusOK {
+		var categories []Category
+		err = json.NewDecoder(res.Body).Decode(&categories)
+		if err == nil {
+			for _, cat := range categories {
+				store.Categories[cat.ID] = cat.Name
+			}
+		}
+	}
+
+	return nil
+}
+
+// Enrich a single car model with manufacturer and category details
+func enrich(m CarModel) EnrichedCarModel {
+	enriched := EnrichedCarModel{
+		CarModel: m,
+	}
+
+	// Fetch manufacturer details
+	var manufacturer Manufacturer
+	if err := FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, m.ManufacturerID, &manufacturer); err == nil {
+		enriched.ManufacturerName = manufacturer.Make
+		enriched.ManufacturerCountry = manufacturer.CountryOfOrigin
+		enriched.FoundingYear = manufacturer.FoundingYear
+	}
+
+	// Get category name from store
+	enriched.CategoryName = store.Categories[m.CategoryID]
+
+	return enriched
+}
+
+// Enrich all car models
+func enrichAll() []EnrichedCarModel {
+	enriched := make([]EnrichedCarModel, 0, len(store.CarModels))
+	for _, model := range store.CarModels {
+		enriched = append(enriched, enrich(model))
+	}
+	return enriched
+}
+
+// Render a template with the given data
+func render(w http.ResponseWriter, templateName string, data interface{}) error {
+	tmpl, err := template.ParseFiles(
+		"./templates/index.html",
+		"./templates/home.html",
+		"./templates/navfooter.html",
+		"./templates/compare.html",
+	)
+	if err != nil {
+		return err
+	}
+
+	return tmpl.ExecuteTemplate(w, "index.html", data)
 }
