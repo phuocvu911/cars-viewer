@@ -71,4 +71,23 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	wg.Go(func() {
+		FetchCarCategory(errChannel, &car)
+	})
+	wg.Go(func() {
+		FetchCarManufacturer(errChannel, &car)
+	})
+
+	// Wait for both to return
+	wg.Wait()
+
+	// Check for errors
+	if err := <-errChannel; err != nil {
+		http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Set-Cookie", "id="+GenerateCookie(5)+"; Max-Age=2592000")
+
+	render(w, "car.html", car)
 }

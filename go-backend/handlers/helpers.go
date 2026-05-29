@@ -1,14 +1,13 @@
 package handlers
 
 import (
-	"context"
 	"cars-viewer/analytics"
 	"cars-viewer/cookies"
+	"context"
 	"encoding/json"
 	"errors"
 	"html/template"
 	"log"
-	"math/rand/v2"
 	"net/http"
 	"strconv"
 	"sync"
@@ -152,7 +151,8 @@ func FetchCarByID(car_id string, errChan chan<- error, carpointer *Car) {
 	errChan <- nil
 }
 
-	err := FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+// Used for enriching Car object concurrently with FetchCarCategory
+// No need to use sync.Mutex
 func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
 
 	if carpointer.DataPerID.ManufactrurerID < 1 {

@@ -10,7 +10,7 @@ import (
 
 func AppendJSONL(filePath string, record Entry) error {
 
-	if record.ShortID == nil || record.LongID == nil {
+	if record.Id == nil {
 		return errors.New("Entry does not include ID.")
 	}
 

@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	ANALYTICS_MAX_ROWS  int    = 1_000                      // do not start counting larger datasets
-	RUN_ANALYTICS       bool   = true                       // Enable or disable analytics
-	ANALYTICS_FILE_PATH string = "./suggestions-data.jsonl" // Place where the analytics are saved
+	ANALYTICS_MAX_ROWS  int    = 100_000 // do not start counting large datasets
+	RUN_ANALYTICS       bool   = true    // Enable or disable analytics
+	ANALYTICS_FILE_PATH string = "./suggestions-data.jsonl"
 )
 
 type Entry struct {
@@ -31,6 +31,8 @@ type UserPreferences struct {
 // Adds entry to the JSONL and to in-memory struct
 func (self *CookieData) AddEntry(user_long_id, user_short_id, brand, chassis string) error {
 
+// Adds entry to the JSON and to inmemory struct
+func (self *CookieData) AddEntry(id, brand, chassis string) error {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
@@ -39,7 +41,7 @@ func (self *CookieData) AddEntry(user_long_id, user_short_id, brand, chassis str
 
 	new_data.ShortID = &user_short_id
 	new_data.LongID = &user_long_id
-
+	new_data.Id = &id
 	if err := AppendJSONL(ANALYTICS_FILE_PATH, new_data); err != nil {
 		return err
 	}
