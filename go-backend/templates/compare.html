@@ -4,20 +4,28 @@
         <div class="section-header">
             <div class="section-badge">Analysis</div>
             <h2 class="section-title">Compare Models</h2>
-            <p class="section-subtitle">Select 2–4 vehicles to compare side-by-side</p>
+            <p class="section-subtitle">
+                Select 2–4 vehicles to compare side-by-side
+            </p>
         </div>
 
         <form method="POST" action="/compare" class="compare-form-wrapper">
             <div class="checkbox-grid compare-checkbox-grid">
                 {{ range .AllModels }}
                 <div class="checkbox-pill">
-                    <input type="checkbox" id="cmp-{{ .ID }}" name="ids" value="{{ .ID }}">
+                    <input
+                        type="checkbox"
+                        id="cmp-{{ .ID }}"
+                        name="ids"
+                        value="{{ .ID }}"
+                    />
                     <label for="cmp-{{ .ID }}">{{ .Name }}</label>
                 </div>
                 {{ end }}
             </div>
-            <button type="submit" class="btn btn-primary"><span>Compare Selected</span><span
-                    class="btn-arrow">→</span></button>
+            <button type="submit" class="btn btn-primary">
+                <span>Compare Selected</span><span class="btn-arrow">→</span>
+            </button>
         </form>
 
         {{ if .HasResults }}
@@ -26,39 +34,96 @@
                 <table class="compare-table">
                     <thead>
                         <tr>
-                            <th>Spec</th>{{ range .Cars }}<th>{{ .Name }}</th>{{ end }}
+                            <th>Spec</th>
+                            {{ range .Cars }}
+                            <th>{{ .Name }}</th>
+                            {{ end }}
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Image</td>{{ range .Cars }}<td><img src="/api/images/{{ .Image }}"
-                                    class="compare-table-img"></td>{{ end }}
+                            <td>Image</td>
+                            {{ range .Cars }}
+                            <td>
+                                <img
+                                    src="/api/images/{{ .Image }}"
+                                    width="35%"
+                                />
+                                class="compare-table-img">
+                            </td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Category</td>{{ range .Cars }}<td>{{ .CategoryName }}</td>{{ end }}
+                            <td>Category</td>
+                            {{ range .Cars }}
+                            <td>{{ .CategoryName }}</td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Manufacturer</td>{{ range .Cars }}<td>{{ .ManufacturerName }}</td>{{ end }}
+                            <td>Manufacturer</td>
+                            {{ range .Cars }}
+                            <td>{{ .ManufacturerName }}</td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Country</td>{{ range .Cars }}<td>{{ .ManufacturerCountry }}</td>{{ end }}
+                            <td>Country</td>
+                            {{ range .Cars }}
+                            <td>{{ .ManufacturerCountry }}</td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Year</td>{{ range .Cars }}<td {{ if eq .Year $.MaxYear }}class="compare-highlight" {{
-                                end }}>{{ .Year }}</td>{{ end }}
+                            <td>Year</td>
+                            {{ range .Cars }}
+                            <td
+                                {{
+                                if
+                                eq
+                                .Year
+                                $.MaxYear
+                                }}class="compare-highlight"
+                                {{
+                                end
+                                }}
+                            >
+                                {{ .Year }}
+                            </td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Engine</td>{{ range .Cars }}<td>{{ .Specifications.Engine }}</td>{{ end }}
+                            <td>Engine</td>
+                            {{ range .Cars }}
+                            <td>{{ .Specifications.Engine }}</td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Horsepower</td>{{ range .Cars }}<td {{ if eq .Specifications.Horsepower $.MaxHP
-                                }}class="compare-highlight" {{ end }}>{{ .Specifications.Horsepower }} HP</td>{{ end }}
+                            <td>Horsepower</td>
+                            {{ range .Cars }}
+                            <td
+                                {{
+                                if
+                                eq
+                                .Specifications.Horsepower
+                                $.MaxHP
+                                }}class="compare-highlight"
+                                {{
+                                end
+                                }}
+                            >
+                                {{ .Specifications.Horsepower }} HP
+                            </td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Transmission</td>{{ range .Cars }}<td>{{ .Specifications.Transmission }}</td>{{ end }}
+                            <td>Transmission</td>
+                            {{ range .Cars }}
+                            <td>{{ .Specifications.Transmission }}</td>
+                            {{ end }}
                         </tr>
                         <tr>
-                            <td>Drivetrain</td>{{ range .Cars }}<td>{{ .Specifications.Drivetrain }}</td>{{ end }}
+                            <td>Drivetrain</td>
+                            {{ range .Cars }}
+                            <td>{{ .Specifications.Drivetrain }}</td>
+                            {{ end }}
                         </tr>
                     </tbody>
                 </table>

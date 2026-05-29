@@ -2,6 +2,7 @@ package main
 
 import (
 	"cars-viewer/handlers"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -10,11 +11,12 @@ import (
 func main() {
 	// Initialize the store with all car models and categories
 	if err := handlers.InitStore(); err != nil {
-		panic("Failed to initialize store: " + err.Error())
+		log.Fatal("Failed to initialize store: " + err.Error())
 	}
 
 	//page routes
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", handlers.HomeHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
 
@@ -24,6 +26,6 @@ func main() {
 	mux.HandleFunc("/api/images/", func(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
 	})
-
+	log.Println("AutoVault ready to see at http://localhost:8080/")
 	http.ListenAndServe(":8080", mux)
 }
