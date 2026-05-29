@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -10,6 +11,10 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only GET requests are supported.", http.StatusMethodNotAllowed)
 		return
 	}
+
+	c, _ := r.Cookie("id")
+
+	fmt.Println(c)
 
 	car_id := r.URL.Path[len(CARS_ENDPOINT):]
 

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"html/template"
 	"log"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
 	"sync"
@@ -19,6 +20,26 @@ const (
 	CATEGORIES_ROUTE    string = "/api/categories/"
 	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
+
+// Generate random cookie with format "xxxx-xxxx..."
+// The cookie can contain characters ranging from a to z
+// lenght 3 equals to xxxx-xxxx-xxxx
+func GenerateCookie(lenght int) string {
+
+	out := ""
+	for i := 0; i < lenght; i++ {
+		func() {
+			for j := 0; j < 4; j++ {
+				// Returns random letters between byte value 97 and 122 (a - z)
+				out += string(byte(rand.IntN(122-97) + 97))
+			}
+			out += "-"
+
+		}()
+	}
+	// Remove last ugly line
+	return out[:len(out)-1]
+}
 
 // Global store for all models and categories
 type DataStore struct {
@@ -132,7 +153,7 @@ func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
 		return
 	}
 
-	err := FetchDataFromAPIByRouteAndID(CATEGORIES_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+	err := FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
@@ -143,6 +164,8 @@ func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
 
 }
 
+// Used for enriching Car object concurrently with FetchCarManufacturer
+// No need to use sync.Mutex
 func FetchCarCategory(errChan chan<- error, carpointer *Car) {
 
 	if carpointer.DataPerID.CategoryID < 1 {
