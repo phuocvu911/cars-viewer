@@ -49,7 +49,7 @@ func CompareHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		d.MaxHP = maxHP
 		d.MaxYear = maxYear
-		d.HasResults = len(d.Cars) >= 2
+		d.HasResults = (len(d.Cars) >= 2 && len(d.Cars) <= 4)
 	}
 	if err := render(w, "compare.html", d); err != nil {
 		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)

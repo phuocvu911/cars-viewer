@@ -228,3 +228,365 @@ select {
     flex-wrap: wrap;
     margin-bottom: 48px
 }
+
+/* === Footer === */
+.footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 24px;
+    text-align: center
+}
+
+.footer-content {
+    max-width: 1280px;
+    margin: 0 auto
+}
+
+.footer-copyright {
+    color: var(--text3);
+    font-size: 0.8rem
+}
+
+/* === Buttons === */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3)
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(108, 92, 231, 0.45)
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none
+}
+
+.btn-secondary {
+    background: var(--glass2);
+    color: var(--text);
+    border: 1px solid var(--border2)
+}
+
+.btn-secondary:hover {
+    background: var(--glass);
+    border-color: var(--accent);
+    color: var(--accent2)
+}
+
+.btn-arrow {
+    transition: var(--transition)
+}
+
+.btn:hover .btn-arrow {
+    transform: translateX(4px)
+}
+
+/* === Sections === */
+.section {
+    padding: 100px 24px
+}
+
+.section-container {
+    max-width: 1280px;
+    margin: 0 auto
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 48px
+}
+
+.section-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 50px;
+    background: rgba(108, 92, 231, 0.15);
+    color: var(--accent2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px
+}
+
+.section-title {
+    font-family: var(--font2);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 12px
+}
+
+.section-subtitle {
+    color: var(--text2);
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin: 0 auto
+}
+
+/* === Filters === */
+.filters-bar {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 20px;
+    margin-bottom: 32px
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 16px
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 1.2rem
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 44px 14px 44px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1rem;
+    transition: var(--transition)
+}
+
+.search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15)
+}
+
+.search-input::placeholder {
+    color: var(--text3)
+}
+
+.filter-pills {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap
+}
+
+.filter-select {
+    padding: 10px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 150px
+}
+
+.filter-select:focus {
+    border-color: var(--accent)
+}
+
+.filter-select option {
+    background: var(--bg2);
+    color: var(--text)
+}
+
+.filter-results {
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: var(--text3)
+}
+
+/* === Car Grid === */
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px
+}
+
+.car-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    overflow: hidden;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative
+}
+
+.car-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow2)
+}
+
+.car-card-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: var(--transition)
+}
+
+.car-card:hover .car-card-img {
+    transform: scale(1.03)
+}
+
+.car-card-img-wrap {
+    overflow: hidden;
+    position: relative
+}
+
+.car-card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    background: rgba(10, 10, 15, 0.7);
+    backdrop-filter: blur(8px);
+    color: var(--accent3);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--border2)
+}
+
+.car-card-body {
+    padding: 20px
+}
+
+.car-card-name {
+    font-family: var(--font2);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 4px
+}
+
+.car-card-brand {
+    font-size: 0.9rem;
+    color: var(--accent2);
+    margin-bottom: 12px
+}
+
+.car-card-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.car-card-year {
+    font-size: 0.85rem;
+    color: var(--text3)
+}
+
+.car-card-hp {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--gold)
+}
+
+/* === Compare === */
+.checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px
+}
+
+.checkbox-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px
+}
+
+.checkbox-pill input {
+    display: none
+}
+
+.checkbox-pill label {
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500
+}
+
+.checkbox-pill input:checked+label {
+    background: rgba(108, 92, 231, 0.2);
+    border-color: var(--accent);
+    color: var(--accent2)
+}
+
+.compare-checkbox-grid {
+    margin-bottom: 24px
+}
+
+.compare-results-wrapper {
+    margin-top: 40px
+}
+
+.compare-table-img {
+    width: 140px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px
+}
+
+.compare-table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius2);
+    border: 1px solid var(--border)
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse
+}
+
+.compare-table th,
+.compare-table td {
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border)
+}
+
+.compare-table th {
+    background: var(--bg3);
+    color: var(--text3);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600
+}
+
+.compare-table td {
+    font-size: 0.95rem;
+    background: var(--bg2)
+}
+
+.compare-highlight {
+    color: var(--green);
+    font-weight: 900
+}
