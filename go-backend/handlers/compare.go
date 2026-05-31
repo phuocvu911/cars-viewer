@@ -15,14 +15,14 @@ type EnrichedCarModel struct {
 
 type CompareData struct {
 	Page, Title    string
-	AllModels      []EnrichedCarModel
+	AllModels      []CarModel
 	Cars           []EnrichedCarModel
 	MaxHP, MaxYear int
 	HasResults     bool
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
-	d := CompareData{Page: "compare", Title: "Compare", AllModels: enrichAll()}
+	d := CompareData{Page: "compare", Title: "Compare", AllModels: store.CarModels}
 
 	if r.Method == http.MethodPost {
 		r.ParseForm()
@@ -33,7 +33,7 @@ func CompareHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				continue
 			}
-			for _, m := range store.CarModels {
+			for _, m := range d.AllModels {
 				if m.ID == id {
 					em := enrich(m)
 					d.Cars = append(d.Cars, em)

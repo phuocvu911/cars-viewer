@@ -183,18 +183,19 @@ func InitStore() error {
 	return nil
 }
 
-// Enrich a single car model with manufacturer and category details
+// Enrich a single car model with manufacturer and category details, like joining tables in SQL, we mathching by ID.
 func enrich(m CarModel) EnrichedCarModel {
 	enriched := EnrichedCarModel{
 		CarModel: m,
 	}
 
-	// Fetch manufacturer details
-	var manufacturer Manufacturer
-	if err := FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, m.ManufacturerID, &manufacturer); err == nil {
-		enriched.ManufacturerName = manufacturer.Name
-		enriched.ManufacturerCountry = manufacturer.CountryOfOrigin
-		enriched.FoundingYear = manufacturer.FoundingYear
+	// Get manufacturer details from store
+	for _, mfg := range store.Manufacturers {
+		if mfg.ID == m.ManufacturerID {
+			enriched.ManufacturerName = mfg.Name
+			enriched.ManufacturerCountry = mfg.CountryOfOrigin
+			enriched.FoundingYear = mfg.FoundingYear
+		}
 	}
 
 	// Get category name from store
