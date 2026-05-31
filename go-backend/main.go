@@ -16,7 +16,11 @@ func main() {
 
 	//page routes
 	mux := http.NewServeMux()
+
+	//serve css file
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
+	mux.HandleFunc("/gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
 

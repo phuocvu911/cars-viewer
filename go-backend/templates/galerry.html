@@ -1,1 +1,75 @@
+{{ define "content" }}
 
+<!-- Gallery -->
+<section id="gallery" class="section gallery-section">
+    <div class="section-container">
+        <div class="section-header">
+            <div class="section-badge">Collection</div>
+            <h2 class="section-title">Car Gallery</h2>
+            <p class="section-subtitle">Browse our curated collection of premium vehicles</p>
+        </div>
+
+        <!-- Filter Form -->
+        <form method="GET" action="/gallery" class="filters-bar">
+            <div class="search-box">
+                <span class="search-icon">⌕</span>
+                <input type="text" name="q" class="search-input" placeholder="Search by name, brand, country..."
+                    value="{{ .Query }}">
+            </div>
+            <div class="filter-pills">
+                <select name="category" class="filter-select">
+                    <option value="">All Categories</option>
+                    {{ range .Categories }}<option value="{{ .ID }}" {{ if eq $.CatF (itoa .ID) }}selected{{ end }}>{{
+                        .Name }}</option>{{ end }}
+                </select>
+                <select name="manufacturer" class="filter-select">
+                    <option value="">All Brands</option>
+                    {{ range .Manufacturers }}<option value="{{ .ID }}" {{ if eq $.MfgF (itoa .ID) }}selected{{ end }}>
+                        {{ .Name }}</option>{{ end }}
+                </select>
+                <select name="year" class="filter-select">
+                    <option value="">All Years</option>
+                    {{ range .Years }}<option value="{{ . }}" {{ if eq $.YearF . }}selected{{ end }}>{{ . }}</option>{{
+                    end }}
+                </select>
+                <select name="drivetrain" class="filter-select">
+                    <option value="">All Drivetrains</option>
+                    {{ range .Drivetrains }}<option value="{{ . }}" {{ if eq $.DriveF . }}selected{{ end }}>{{ . }}
+                    </option>{{ end }}
+                </select>
+                <button type="submit" class="btn btn-primary filter-button">Filter</button>
+                {{ if or .Query .CatF .MfgF .YearF .DriveF }}<a href="/gallery"
+                    class="btn btn-secondary clear-button">Clear</a>{{ end }}
+            </div>
+            <div class="filter-results">{{ .ResultCount }} vehicle{{ if ne .ResultCount 1 }}s{{ end }} found</div>
+        </form>
+
+        <!-- Car Grid -->
+        <div class="car-grid">
+            {{ if .Models }}
+            {{ range .Models }}
+            <a href="/car/{{ .ID }}" class="car-card">
+                <div class="car-card-img-wrap">
+                    <img class="car-card-img" src="/api/images/{{ .Image }}" alt="{{ .Name }}" loading="lazy">
+                    <span class="car-card-badge">{{ .CategoryName }}</span>
+                </div>
+                <div class="car-card-body">
+                    <div class="car-card-name">{{ .Name }}</div>
+                    <div class="car-card-brand">{{ .ManufacturerName }} · {{ .ManufacturerCountry }}</div>
+                </div>
+                <div class="car-card-footer">
+                    <span class="car-card-year">{{ .Year }}</span>
+                    <span class="car-card-hp">⚡ {{ .Specifications.Horsepower }} HP</span>
+                </div>
+            </a>
+            {{ end }}
+            {{ else }}
+            <div class="no-results">
+                <div class="no-results-icon">🔍</div>
+                <div class="no-results-text">No vehicles match your criteria. Try adjusting filters.</div>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+</section>
+{{ end }}

@@ -13,12 +13,7 @@
             <div class="checkbox-grid compare-checkbox-grid">
                 {{ range .AllModels }}
                 <div class="checkbox-pill">
-                    <input
-                        type="checkbox"
-                        id="cmp-{{ .ID }}"
-                        name="ids"
-                        value="{{ .ID }}"
-                    />
+                    <input type="checkbox" id="cmp-{{ .ID }}" name="ids" value="{{ .ID }}" />
                     <label for="cmp-{{ .ID }}">{{ .Name }}</label>
                 </div>
                 {{ end }}
@@ -45,10 +40,7 @@
                             <td>Image</td>
                             {{ range .Cars }}
                             <td>
-                                <img
-                                    src="/api/images/{{ .Image }}"
-                                    width="35%"
-                                />
+                                <img src="/api/images/{{ .Image }}" width="35%" />
                                 class="compare-table-img">
                             </td>
                             {{ end }}
@@ -74,17 +66,7 @@
                         <tr>
                             <td>Year</td>
                             {{ range .Cars }}
-                            <td
-                                {{
-                                if
-                                eq
-                                .Year
-                                $.MaxYear
-                                }}class="compare-highlight"
-                                {{
-                                end
-                                }}
-                            >
+                            <td {{ if eq .Year $.MaxYear }}class="compare-highlight" {{ end }}>
                                 {{ .Year }}
                             </td>
                             {{ end }}
@@ -98,17 +80,7 @@
                         <tr>
                             <td>Horsepower</td>
                             {{ range .Cars }}
-                            <td
-                                {{
-                                if
-                                eq
-                                .Specifications.Horsepower
-                                $.MaxHP
-                                }}class="compare-highlight"
-                                {{
-                                end
-                                }}
-                            >
+                            <td {{ if eq .Specifications.Horsepower $.MaxHP }}class="compare-highlight" {{ end }}>
                                 {{ .Specifications.Horsepower }} HP
                             </td>
                             {{ end }}

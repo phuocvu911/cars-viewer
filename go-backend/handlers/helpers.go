@@ -20,12 +20,13 @@ const (
 )
 
 // Global store for all models and categories
-type Store struct {
-	CarModels  []CarModel
-	Categories map[int]string // categoryID -> categoryName
+type DataStore struct {
+	Manufacturers []Manufacturer `json:"manufacturers"`
+	Categories    []Category     `json:"categories"`
+	CarModels     []CarModel     `json:"carModels"`
 }
 
-var store Store
+var store DataStore
 
 type CarModel struct {
 	ID             int              `json:"id"`
@@ -146,7 +147,7 @@ func InitStore() error {
 	}
 
 	// Fetch all categories
-	store.Categories = make(map[int]string)
+	store.Categories = make([]Category, 0)
 	res, err = http.Get(API_BASE_URL + ALL_CATEGORIES_ROUTE)
 	if err != nil {
 		return err
@@ -158,7 +159,7 @@ func InitStore() error {
 		err = json.NewDecoder(res.Body).Decode(&categories)
 		if err == nil {
 			for _, cat := range categories {
-				store.Categories[cat.ID] = cat.Name
+				store.Categories = append(store.Categories, cat)
 			}
 		}
 	}
@@ -181,7 +182,12 @@ func enrich(m CarModel) EnrichedCarModel {
 	}
 
 	// Get category name from store
-	enriched.CategoryName = store.Categories[m.CategoryID]
+	for _, cat := range store.Categories {
+		if cat.ID == m.CategoryID {
+			enriched.CategoryName = cat.Name
+			break
+		}
+	}
 
 	return enriched
 }
