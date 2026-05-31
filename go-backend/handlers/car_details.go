@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-var tmpl, _ = template.ParseFiles("./templates/index.html", "./templates/home.html", "./templates/navfooter.html", "./templates/car.html")
+var tmpl, _ = template.ParseFiles("./templates/index.html", "./templates/home.html", "./templates/navfooter.html", "./templates/car.html", "./templates/compare.html", "./templates/gallery.html")
 
 func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 

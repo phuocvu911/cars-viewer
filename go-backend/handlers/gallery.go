@@ -13,6 +13,7 @@ type GalleryData struct {
 	Manufacturers                    []Manufacturer
 	Drivetrains, Years               []string
 	Query, CatF, MfgF, YearF, DriveF string
+	ResultCount                      int
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,6 +84,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		Models: filtered, Categories: store.Categories, Manufacturers: store.Manufacturers,
 		Drivetrains: drives, Years: years,
 		Query: search, CatF: catF, MfgF: mfgF, YearF: yearF, DriveF: driveF,
+		ResultCount: len(filtered),
 	}
 	render(w, "gallery.html", data)
 }

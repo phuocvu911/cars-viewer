@@ -20,7 +20,7 @@ func main() {
 	//serve css file
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.HandleFunc("GET /gallery", handlers.GalleryHandler)
+	mux.HandleFunc("/gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
 

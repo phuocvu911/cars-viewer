@@ -212,5 +212,9 @@ func render(w http.ResponseWriter, templateName string, data any) error {
 		return err
 	}
 
+	tmpl = tmpl.Funcs(template.FuncMap{
+		"itoa": strconv.Itoa,
+	})
+
 	return tmpl.ExecuteTemplate(w, "index.html", data)
 }
