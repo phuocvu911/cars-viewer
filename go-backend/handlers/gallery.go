@@ -17,7 +17,10 @@ type GalleryData struct {
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
-
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET requests are supported.", http.StatusMethodNotAllowed)
+		return
+	}
 	q := r.URL.Query()
 	models := enrichAll()
 
@@ -86,5 +89,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		Query: search, CatF: catF, MfgF: mfgF, YearF: yearF, DriveF: driveF,
 		ResultCount: len(filtered),
 	}
-	render(w, "gallery.html", data)
+	if err := render(w, "gallery.html", data); err != nil {
+		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
+	}
 }

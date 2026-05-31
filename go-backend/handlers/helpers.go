@@ -9,12 +9,13 @@ import (
 )
 
 const (
-	API_BASE_URL         string = "http://localhost:3000"
-	MODELS_ROUTE         string = "/api/models/"
-	MANUFACTURER_ROUTE   string = "/api/manufacturers/"
-	CATEGORIES_ROUTE     string = "/api/categories/"
-	ALL_MODELS_ROUTE     string = "/api/models"
-	ALL_CATEGORIES_ROUTE string = "/api/categories"
+	API_BASE_URL            string = "http://localhost:3000"
+	MODELS_ROUTE            string = "/api/models/"
+	MANUFACTURER_ROUTE      string = "/api/manufacturers/"
+	CATEGORIES_ROUTE        string = "/api/categories/"
+	ALL_MODELS_ROUTE        string = "/api/models"
+	ALL_CATEGORIES_ROUTE    string = "/api/categories"
+	ALL_MANUFACTURERS_ROUTE string = "/api/manufacturers"
 
 	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
@@ -51,7 +52,8 @@ type Car struct {
 
 // Access via /api/manufacturers/{id}
 type Manufacturer struct {
-	Make            string `json:"name"`
+	ID              int    `json:"id"`
+	Name            string `json:"name"`
 	CountryOfOrigin string `json:"country"`
 	FoundingYear    int    `json:"foundingYear"`
 }
@@ -147,21 +149,35 @@ func InitStore() error {
 	}
 
 	// Fetch all categories
-	store.Categories = make([]Category, 0)
 	res, err = http.Get(API_BASE_URL + ALL_CATEGORIES_ROUTE)
 	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode == http.StatusOK {
-		var categories []Category
-		err = json.NewDecoder(res.Body).Decode(&categories)
-		if err == nil {
-			for _, cat := range categories {
-				store.Categories = append(store.Categories, cat)
-			}
-		}
+	if res.StatusCode != http.StatusOK {
+		return errors.New("failed to fetch categories: status code " + strconv.Itoa(res.StatusCode))
+	}
+
+	err = json.NewDecoder(res.Body).Decode(&store.Categories)
+	if err != nil {
+		return err
+	}
+
+	// Fetch all manufacturers
+	res, err = http.Get(API_BASE_URL + ALL_MANUFACTURERS_ROUTE)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return errors.New("failed to fetch manufacturers: status code " + strconv.Itoa(res.StatusCode))
+	}
+
+	err = json.NewDecoder(res.Body).Decode(&store.Manufacturers)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -176,7 +192,7 @@ func enrich(m CarModel) EnrichedCarModel {
 	// Fetch manufacturer details
 	var manufacturer Manufacturer
 	if err := FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, m.ManufacturerID, &manufacturer); err == nil {
-		enriched.ManufacturerName = manufacturer.Make
+		enriched.ManufacturerName = manufacturer.Name
 		enriched.ManufacturerCountry = manufacturer.CountryOfOrigin
 		enriched.FoundingYear = manufacturer.FoundingYear
 	}
@@ -203,7 +219,11 @@ func enrichAll() []EnrichedCarModel {
 
 // Render a template with the given data
 func render(w http.ResponseWriter, templateName string, data any) error {
-	tmpl, err := template.ParseFiles(
+	funcMap := template.FuncMap{
+		"itoa": strconv.Itoa,
+	}
+
+	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFiles(
 		"./templates/index.html",
 		"./templates/navfooter.html",
 		"./templates/"+templateName,
@@ -211,10 +231,6 @@ func render(w http.ResponseWriter, templateName string, data any) error {
 	if err != nil {
 		return err
 	}
-
-	tmpl = tmpl.Funcs(template.FuncMap{
-		"itoa": strconv.Itoa,
-	})
 
 	return tmpl.ExecuteTemplate(w, "index.html", data)
 }

@@ -11,7 +11,7 @@ import (
 func main() {
 	// Initialize the store with all car models and categories
 	if err := handlers.InitStore(); err != nil {
-		log.Fatal("Failed to initialize store: " + err.Error())
+		log.Fatal("Failed to fetch data: " + err.Error())
 	}
 
 	//page routes

@@ -3,7 +3,7 @@
 
     <h2 id="content-header">{{.DataPerID.MakeModel}} {{.DataPerID.Year}} </h2>
 
-    <img src="{{.DataPerID.ImgSrc}}" alt="Picture of a car" width="95%"> 
+    <img src="{{.DataPerID.ImgSrc}}" alt="Picture of a car" width="95%">
 
     <ul id="specifications">
         <h2>Specifications</h2>
@@ -14,9 +14,10 @@
     </ul>
 
     <ul id="about-manufacturer">
-        <h2>About {{.ManufactDetails.Make}}</h2>
-        <h3>{{.ManufactDetails.Make}} was founded in {{.ManufactDetails.CountryOfOrigin}} in {{.ManufactDetails.FoundingYear}}</h3>
+        <h2>About {{.ManufactDetails.Name}}</h2>
+        <h3>{{.ManufactDetails.Name}} was founded in {{.ManufactDetails.CountryOfOrigin}} in
+            {{.ManufactDetails.FoundingYear}}</h3>
     </ul>
-   
+
 </div>
 {{end}}
