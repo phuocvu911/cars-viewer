@@ -590,3 +590,21 @@ select {
     color: var(--green);
     font-weight: 900
 }
+
+/* === No Results === */
+.no-results {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px
+}
+
+.no-results-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5
+}
+
+.no-results-text {
+    font-size: 1.1rem;
+    color: var(--text2)
+}
