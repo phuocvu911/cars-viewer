@@ -29,7 +29,7 @@ make api
 ```
 
 ## Run Go backend server
-On the new terminal:
+Open the new terminal. On the new terminal:
 ```bash 
 make run
 ```
