@@ -22,3 +22,28 @@ after we add
 
 
 # Run the project 
+
+## Run api server
+```bash 
+make api
+```
+Open new terminal
+
+
+## Run Go backend server
+```bash 
+make run
+```
+
+# Overview
+...
+
+# Extras
+
+## Search options and advanced filter
+
+## Comparision feature
+
+## Recommendation feature
+
+## Page analytics

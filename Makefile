@@ -1,6 +1,6 @@
 .PHONY: run
 
-api-run:
+api:
 	cd cars-api && node main.js
 
 run:
