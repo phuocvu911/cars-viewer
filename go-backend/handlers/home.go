@@ -4,6 +4,10 @@ import (
 	"net/http"
 )
 
+type HomeData struct {
+	Page, Tittle string
+}
+
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -13,7 +17,8 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only GET requests are supported.", http.StatusMethodNotAllowed)
 		return
 	}
-	if err := render(w, "home.html", nil); err != nil {
+	data := HomeData{Page: "home", Tittle: "Home"}
+	if err := render(w, "home.html", data); err != nil {
 		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
 	}
 }

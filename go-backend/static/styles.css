@@ -128,8 +128,8 @@ select {
 
 .nav-link:hover,
 .nav-link.active {
-    color: var(--text);
-    background: var(--glass2)
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
 }
 
 .nav-menu-btn {
