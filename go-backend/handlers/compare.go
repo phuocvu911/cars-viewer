@@ -14,11 +14,11 @@ type EnrichedCarModel struct {
 }
 
 type CompareData struct {
-	Page, Title    string
-	AllModels      []CarModel
-	Cars           []EnrichedCarModel
-	MaxHP, MaxYear int
-	HasResults     bool
+	Page, Title                string
+	AllModels                  []CarModel
+	Cars                       []EnrichedCarModel
+	MaxHP, MaxYear             int
+	HasResults, FilterReceived bool
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +50,7 @@ func CompareHandler(w http.ResponseWriter, r *http.Request) {
 		d.MaxHP = maxHP
 		d.MaxYear = maxYear
 		d.HasResults = (len(d.Cars) >= 2 && len(d.Cars) <= 4)
+		d.FilterReceived = true
 	}
 	if err := render(w, "compare.html", d); err != nil {
 		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
