@@ -21,6 +21,29 @@ const (
 	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
 
+// Return cookie value
+func AllowedToTrack(r *http.Request) (bool, error) {
+	cookie, err := r.Cookie(ACCEPTED_COOKIES_COOKIE_NAME)
+
+	if err != nil {
+		return false, err
+	}
+
+	return cookie.Value == "true", nil
+
+}
+
+func GetTrackingCookie(r *http.Request) (string, error) {
+	cookie, err := r.Cookie(TRACKING_COOKIE_NAME)
+
+	if err != nil {
+		return "", err
+	}
+
+	return cookie.Value, nil
+
+}
+
 // Generate random cookie with format "xxxx-xxxx..."
 // The cookie can contain characters ranging from a to z
 // lenght 3 equals to xxxx-xxxx-xxxx
