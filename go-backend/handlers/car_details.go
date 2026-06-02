@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -12,11 +11,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c, _ := r.Cookie("id")
-
-	fmt.Println(c)
-
-	car_id := r.URL.Path[len(CARS_ENDPOINT):]
+	car_id := r.URL.Path[len(CAR_ENDPOINT):]
 
 	if len(car_id) == 0 || len(car_id) > 10 {
 		http.Error(w, "Bad request.", http.StatusBadRequest)
