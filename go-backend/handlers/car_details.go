@@ -30,6 +30,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
+	car.Page = "gallery"
 
 	render(w, "car.html", car)
 

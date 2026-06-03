@@ -49,6 +49,7 @@ type Category struct {
 type Car struct {
 	DataPerID       CarSpecs
 	ManufactDetails Manufacturer
+	Page            string
 }
 
 // Access via /api/manufacturers/{id}
