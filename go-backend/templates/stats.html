@@ -19,26 +19,27 @@
                 <div class="stat-card-label">Manufacturers</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon">⚡</div>
-                <div class="stat-card-value">{{ index .Stats "AvgHP" }}</div>
-                <div class="stat-card-label">Avg Horsepower</div>
+                <div class="stat-card-icon">🛒</div>
+                <div class="stat-card-value">{{ .TotalCats }}</div>
+                <div class="stat-card-label">Categories</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon">🏆</div>
-                <div class="stat-card-value">{{ index .Stats "MaxHP" }} HP</div>
+                <div class="stat-card-value">{{ .MaxHp }}</div>
                 <div class="stat-card-label">Most Powerful</div>
-                <div class="stat-card-sub">{{ index .Stats "MaxCar" }}</div>
+                <div class="stat-card-sub">{{ .MaxCar }}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-card-icon">🏷️</div>
-                <div class="stat-card-value">{{ index .Stats "MinHP" }} HP</div>
+                <div class="stat-card-value">{{ .MinHp }} HP</div>
                 <div class="stat-card-label">Most Efficient</div>
-                <div class="stat-card-sub">{{ index .Stats "MinCar" }}</div>
+                <div class="stat-card-sub">{{ .MinCar }}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-card-icon">📊</div>
-                <div class="stat-card-value">{{ .TotalCats }}</div>
-                <div class="stat-card-label">Categories</div>
+                <div class="stat-card-icon">♨️</div>
+                <div class="stat-card-value">{{ .MostCommonCategory }}</div>
+                <div class="stat-card-label">Most Common Category</div>
+                <div class="stat-card-sub">{{ .MaxCategoryCount }} cars</div>
             </div>
         </div>
     </div>

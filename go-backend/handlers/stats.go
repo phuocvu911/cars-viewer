@@ -11,6 +11,7 @@ type StatsData struct {
 	MaxHp, MaxCar                     string
 	MinHp, MinCar                     string
 	MostCommonCategory                string
+	MaxCategoryCount                  int
 }
 
 func StatsHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,5 +65,6 @@ func buildStatsData() StatsData {
 		MinHp:              strconv.Itoa(minHp),
 		MinCar:             minCar,
 		MostCommonCategory: mostCommonCategory,
+		MaxCategoryCount:   maxCount,
 	}
 }
