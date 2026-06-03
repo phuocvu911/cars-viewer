@@ -31,11 +31,6 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
 
-	err := render(w, "car.html", car)
-
-	if err != nil {
-		http.Error(w, "Failed to execute template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render(w, "car.html", car)
 
 }

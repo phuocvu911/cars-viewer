@@ -9,6 +9,9 @@ import (
 )
 
 func main() {
+	// Innitialize templates
+	handlers.InitTemplates()
+
 	// Initialize the store with all car models and categories
 	if err := handlers.InitStore(); err != nil {
 		log.Fatal("Failed to fetch data: " + err.Error())

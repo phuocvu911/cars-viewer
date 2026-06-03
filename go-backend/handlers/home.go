@@ -18,7 +18,5 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := HomeData{Page: "home", Tittle: "Home"}
-	if err := render(w, "home.html", data); err != nil {
-		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
-	}
+	render(w, "home.html", data)
 }

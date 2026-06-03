@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -218,20 +219,35 @@ func enrichAll() []EnrichedCarModel {
 	return enriched
 }
 
-// Render a template with the given data
-func render(w http.ResponseWriter, templateName string, data any) error {
+var templates = make(map[string]*template.Template)
+
+// Initialize templates and cache them in a map for efficient rendering. This is called once at main.
+func InitTemplates() {
 	funcMap := template.FuncMap{
 		"itoa": strconv.Itoa,
 	}
 
-	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFiles(
-		"./templates/index.html",
-		"./templates/navfooter.html",
-		"./templates/"+templateName,
-	)
-	if err != nil {
-		return err
+	pages := []string{"home.html", "gallery.html", "car.html", "compare.html", "recommend.html"}
+	for _, page := range pages {
+		templates[page] = template.Must(template.New(page).Funcs(funcMap).ParseFiles(
+			"templates/index.html",
+			"templates/navfooter.html",
+			"templates/"+page,
+		))
 	}
+}
 
-	return tmpl.ExecuteTemplate(w, "index.html", data)
+// Render a template with the given data
+func render(w http.ResponseWriter, page string, data any) {
+	t, ok := templates[page]
+	if !ok {
+		log.Printf("Template %s not found in cache", page)
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return
+	}
+	err := t.ExecuteTemplate(w, "index.html", data)
+	if err != nil {
+		log.Printf("Error rendering template %s: %v", page, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

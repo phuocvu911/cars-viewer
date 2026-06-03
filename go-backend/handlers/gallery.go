@@ -89,7 +89,5 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		Query: search, CatF: catF, MfgF: mfgF, YearF: yearF, DriveF: driveF,
 		ResultCount: len(filtered),
 	}
-	if err := render(w, "gallery.html", data); err != nil {
-		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
-	}
+	render(w, "gallery.html", data)
 }
