@@ -132,23 +132,6 @@ select {
     color: #fff;
 }
 
-.nav-menu-btn {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    cursor: pointer;
-    padding: 4px
-}
-
-.nav-menu-btn span {
-    width: 22px;
-    height: 2px;
-    background: var(--text2);
-    border-radius: 2px;
-    transition: var(--transition)
-}
-
 /* === Home === */
 .hero-section {
     min-height: 100vh;
@@ -159,25 +142,6 @@ select {
     padding: 120px 24px 80px;
     position: relative;
     overflow: hidden
-}
-
-.hero-bg-animation {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 30% 20%, rgba(108, 92, 231, 0.15), transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(167, 139, 250, 0.1), transparent 50%);
-    animation: heroPulse 8s ease-in-out infinite alternate
-}
-
-@keyframes heroPulse {
-    0% {
-        opacity: 0.7;
-        transform: scale(1)
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1.05)
-    }
 }
 
 .hero-content {
