@@ -1,7 +1,7 @@
 .PHONY: run
 
 api:
-	cd cars-api && node main.js
+	cd cars-api && make build && make run
 
 run:
 	cd go-backend && go run main.go

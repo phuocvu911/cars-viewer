@@ -17,15 +17,15 @@ func main() {
 		log.Fatal("Failed to fetch data: " + err.Error())
 	}
 
-	//page routes
 	mux := http.NewServeMux()
 
-	//serve css file
+	// Serving css file and hooking up the handlers
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
 	mux.HandleFunc("/gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
+	mux.HandleFunc("/stats", handlers.StatsHandler)
 
 	// Proxy image requests to localhost:3000
 	remoteURL, _ := url.Parse(handlers.API_BASE_URL)
