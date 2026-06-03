@@ -14,15 +14,15 @@ type EnrichedCarModel struct {
 }
 
 type CompareData struct {
-	Page, Title    string
-	AllModels      []EnrichedCarModel
-	Cars           []EnrichedCarModel
-	MaxHP, MaxYear int
-	HasResults     bool
+	Page, Title                string
+	AllModels                  []CarModel
+	Cars                       []EnrichedCarModel
+	MaxHP, MaxYear             int
+	HasResults, FilterReceived bool
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
-	d := CompareData{Page: "compare", Title: "Compare", AllModels: enrichAll()}
+	d := CompareData{Page: "compare", Title: "Compare", AllModels: store.CarModels}
 
 	if r.Method == http.MethodPost {
 		r.ParseForm()
@@ -33,7 +33,7 @@ func CompareHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				continue
 			}
-			for _, m := range store.CarModels {
+			for _, m := range d.AllModels {
 				if m.ID == id {
 					em := enrich(m)
 					d.Cars = append(d.Cars, em)
@@ -49,9 +49,8 @@ func CompareHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		d.MaxHP = maxHP
 		d.MaxYear = maxYear
-		d.HasResults = len(d.Cars) >= 2
+		d.HasResults = (len(d.Cars) >= 2 && len(d.Cars) <= 4)
+		d.FilterReceived = true
 	}
-	if err := render(w, "compare.html", d); err != nil {
-		http.Error(w, "Failed to render template: "+err.Error(), http.StatusInternalServerError)
-	}
+	render(w, "compare.html", d)
 }

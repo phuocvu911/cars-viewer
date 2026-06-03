@@ -1,11 +1,8 @@
 package handlers
 
 import (
-	"html/template"
 	"net/http"
 )
-
-var tmpl, _ = template.ParseFiles("./templates/index.html", "./templates/home.html", "./templates/navfooter.html", "./templates/car.html")
 
 func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -33,12 +30,8 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
+	car.Page = "gallery"
 
-	err := tmpl.ExecuteTemplate(w, "index.html", car)
-
-	if err != nil {
-		http.Error(w, "Failed to execute template: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	render(w, "car.html", car)
 
 }

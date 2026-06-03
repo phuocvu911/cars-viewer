@@ -4,10 +4,10 @@
         <a href="/" class="nav-logo"><span class="logo-icon">◈</span><span class="logo-text">Auto<span
                     class="logo-accent">Vault</span></span></a>
         <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/gallery">Gallery</a>
-            <a href="/compare">Compare</a>
-            <a href="/recommend">For You</a>
+            <a href="/" class="nav-link {{ if eq .Page `home` }}active{{ end }}">Home</a>
+            <a href="/gallery" class="nav-link {{ if eq .Page `gallery` }}active{{ end }}">Gallery</a>
+            <a href="/compare" class="nav-link {{ if eq .Page `compare` }}active{{ end }}">Compare</a>
+            <a href="/recommend" class="nav-link {{ if eq .Page `recommend` }}active{{ end }}">For You</a>
         </div>
     </div>
 </nav>

@@ -9,14 +9,21 @@ import (
 )
 
 func main() {
+	// Innitialize templates
+	handlers.InitTemplates()
+
 	// Initialize the store with all car models and categories
 	if err := handlers.InitStore(); err != nil {
-		log.Fatal("Failed to initialize store: " + err.Error())
+		log.Fatal("Failed to fetch data: " + err.Error())
 	}
 
 	//page routes
 	mux := http.NewServeMux()
+
+	//serve css file
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
+	mux.HandleFunc("/gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
 
