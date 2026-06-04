@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const (
@@ -133,13 +135,13 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 func InitStore() error {
 	errChan := make(chan error, 3)
 	go func() {
-		errChan <- FetchDataFromAPI(MODELS_ROUTE, &store.CarModels)
+		errChan <- fetchDataFromAPI(MODELS_ROUTE, &store.CarModels)
 	}()
 	go func() {
-		errChan <- FetchDataFromAPI(CATEGORIES_ROUTE, &store.Categories)
+		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &store.Categories)
 	}()
 	go func() {
-		errChan <- FetchDataFromAPI(MANUFACTURERS_ROUTE, &store.Manufacturers)
+		errChan <- fetchDataFromAPI(MANUFACTURERS_ROUTE, &store.Manufacturers)
 	}()
 	for range 3 {
 		if err := <-errChan; err != nil {
@@ -149,7 +151,7 @@ func InitStore() error {
 	return nil
 }
 
-func FetchDataFromAPI(path string, v any) error {
+func fetchDataFromAPI(path string, v any) error {
 	resp, err := http.Get(API_BASE_URL + path)
 	if err != nil {
 		return err
@@ -159,6 +161,25 @@ func FetchDataFromAPI(path string, v any) error {
 		return errors.New("unexpected status: " + strconv.Itoa(resp.StatusCode) + " for endpoint: " + path)
 	}
 	return json.NewDecoder(resp.Body).Decode(v)
+}
+
+// Start a background goroutine to refresh the store every 10 minutes.
+func StoreRefresh(ctx context.Context) {
+	ticker := time.NewTicker(10 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			if err := InitStore(); err != nil {
+				log.Println("store refresh failed:", err)
+			} else {
+				log.Println("store refreshed successfully")
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
 }
 
 // Enrich a single car model with manufacturer and category details, like joining tables in SQL, we mathching by ID.

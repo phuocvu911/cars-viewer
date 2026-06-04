@@ -2,6 +2,7 @@ package main
 
 import (
 	"cars-viewer/handlers"
+	"context"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -17,6 +18,10 @@ func main() {
 		log.Fatal("Failed to fetch data: " + err.Error())
 	}
 
+	// Run the background goroutine to refresh the store every 10 minutes
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go handlers.StoreRefresh(ctx)
 	mux := http.NewServeMux()
 
 	// Serving css file and hooking up the handlers
