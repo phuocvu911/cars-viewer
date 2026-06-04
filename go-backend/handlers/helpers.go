@@ -10,13 +10,10 @@ import (
 )
 
 const (
-	API_BASE_URL            string = "http://localhost:3000"
-	MODELS_ROUTE            string = "/api/models/"
-	MANUFACTURER_ROUTE      string = "/api/manufacturers/"
-	CATEGORIES_ROUTE        string = "/api/categories/"
-	ALL_MODELS_ROUTE        string = "/api/models"
-	ALL_CATEGORIES_ROUTE    string = "/api/categories"
-	ALL_MANUFACTURERS_ROUTE string = "/api/manufacturers"
+	API_BASE_URL        string = "http://localhost:3000"
+	MODELS_ROUTE        string = "/api/models/"
+	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
+	CATEGORIES_ROUTE    string = "/api/categories/"
 
 	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
@@ -122,7 +119,7 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 		return
 	}
 
-	err = FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+	err = FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
@@ -134,55 +131,34 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 
 // Initialize the store by fetching all models and categories
 func InitStore() error {
-	// Fetch all car models
-	res, err := http.Get(API_BASE_URL + ALL_MODELS_ROUTE)
-	if err != nil {
-		return err
+	errChan := make(chan error, 3)
+	go func() {
+		errChan <- FetchDataFromAPI(MODELS_ROUTE, &store.CarModels)
+	}()
+	go func() {
+		errChan <- FetchDataFromAPI(CATEGORIES_ROUTE, &store.Categories)
+	}()
+	go func() {
+		errChan <- FetchDataFromAPI(MANUFACTURERS_ROUTE, &store.Manufacturers)
+	}()
+	for range 3 {
+		if err := <-errChan; err != nil {
+			return err
+		}
 	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.New("failed to fetch models: status code " + strconv.Itoa(res.StatusCode))
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&store.CarModels)
-	if err != nil {
-		return err
-	}
-
-	// Fetch all categories
-	res, err = http.Get(API_BASE_URL + ALL_CATEGORIES_ROUTE)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.New("failed to fetch categories: status code " + strconv.Itoa(res.StatusCode))
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&store.Categories)
-	if err != nil {
-		return err
-	}
-
-	// Fetch all manufacturers
-	res, err = http.Get(API_BASE_URL + ALL_MANUFACTURERS_ROUTE)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.New("failed to fetch manufacturers: status code " + strconv.Itoa(res.StatusCode))
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&store.Manufacturers)
-	if err != nil {
-		return err
-	}
-
 	return nil
+}
+
+func FetchDataFromAPI(path string, v any) error {
+	resp, err := http.Get(API_BASE_URL + path)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("unexpected status: " + strconv.Itoa(resp.StatusCode) + " for endpoint: " + path)
+	}
+	return json.NewDecoder(resp.Body).Decode(v)
 }
 
 // Enrich a single car model with manufacturer and category details, like joining tables in SQL, we mathching by ID.

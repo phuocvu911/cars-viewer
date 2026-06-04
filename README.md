@@ -44,9 +44,11 @@ This feature shipped on top of Gallery page. The user can do free-word search, i
 
 The user can filter cars view by clicking the drop down to choose `Categories`, `Brand`, `Year` and `Drivetrain`.
 
+The filter bar send `GET` request to `/gallery` with data as query parameters. This is right choice for retrieving/filtering data — these are read-only operations that don't modify server state.
+
 ## Comparision feature
 Selecting cars and clicking ``Compare`` button sends `POST /compare` with selected IDs
 ## Recommendation feature
 
-## Page analytics
+## Store analytics 
 Some data analytics about the cars that we have in the store.
