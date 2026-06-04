@@ -154,13 +154,17 @@ func InitStore() error {
 func fetchDataFromAPI(path string, v any) error {
 	resp, err := http.Get(API_BASE_URL + path)
 	if err != nil {
-		return err
+		return errors.New("failed to fetch data from " + path + ": " + err.Error())
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("unexpected status: " + strconv.Itoa(resp.StatusCode) + " for endpoint: " + path)
 	}
-	return json.NewDecoder(resp.Body).Decode(v)
+	err = json.NewDecoder(resp.Body).Decode(v)
+	if err != nil {
+		return errors.New("failed to decode JSON from " + path + ": " + err.Error())
+	}
+	return nil
 }
 
 // Start a background goroutine to refresh the store every 10 minutes.
