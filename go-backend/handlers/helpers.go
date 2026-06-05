@@ -1,22 +1,21 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const (
-	API_BASE_URL            string = "http://localhost:3000"
-	MODELS_ROUTE            string = "/api/models/"
-	MANUFACTURER_ROUTE      string = "/api/manufacturers/"
-	CATEGORIES_ROUTE        string = "/api/categories/"
-	ALL_MODELS_ROUTE        string = "/api/models"
-	ALL_CATEGORIES_ROUTE    string = "/api/categories"
-	ALL_MANUFACTURERS_ROUTE string = "/api/manufacturers"
+	API_BASE_URL        string = "http://localhost:3000"
+	MODELS_ROUTE        string = "/api/models/"
+	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
+	CATEGORIES_ROUTE    string = "/api/categories/"
 
 	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
@@ -122,7 +121,7 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 		return
 	}
 
-	err = FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+	err = FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
@@ -134,55 +133,57 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 
 // Initialize the store by fetching all models and categories
 func InitStore() error {
-	// Fetch all car models
-	res, err := http.Get(API_BASE_URL + ALL_MODELS_ROUTE)
-	if err != nil {
-		return err
+	errChan := make(chan error, 3)
+	go func() {
+		errChan <- fetchDataFromAPI(MODELS_ROUTE, &store.CarModels)
+	}()
+	go func() {
+		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &store.Categories)
+	}()
+	go func() {
+		errChan <- fetchDataFromAPI(MANUFACTURERS_ROUTE, &store.Manufacturers)
+	}()
+	for range 3 {
+		if err := <-errChan; err != nil {
+			return err
+		}
 	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.New("failed to fetch models: status code " + strconv.Itoa(res.StatusCode))
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&store.CarModels)
-	if err != nil {
-		return err
-	}
-
-	// Fetch all categories
-	res, err = http.Get(API_BASE_URL + ALL_CATEGORIES_ROUTE)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.New("failed to fetch categories: status code " + strconv.Itoa(res.StatusCode))
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&store.Categories)
-	if err != nil {
-		return err
-	}
-
-	// Fetch all manufacturers
-	res, err = http.Get(API_BASE_URL + ALL_MANUFACTURERS_ROUTE)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.New("failed to fetch manufacturers: status code " + strconv.Itoa(res.StatusCode))
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&store.Manufacturers)
-	if err != nil {
-		return err
-	}
-
 	return nil
+}
+
+func fetchDataFromAPI(path string, v any) error {
+	resp, err := http.Get(API_BASE_URL + path)
+	if err != nil {
+		return errors.New("failed to fetch data from " + path + ": " + err.Error())
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("unexpected status: " + strconv.Itoa(resp.StatusCode) + " for endpoint: " + path)
+	}
+	err = json.NewDecoder(resp.Body).Decode(v)
+	if err != nil {
+		return errors.New("failed to decode JSON from " + path + ": " + err.Error())
+	}
+	return nil
+}
+
+// Start a background goroutine to refresh the store every 10 minutes.
+func StoreRefresh(ctx context.Context) {
+	ticker := time.NewTicker(10 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			if err := InitStore(); err != nil {
+				log.Println("store refresh failed:", err)
+			} else {
+				log.Println("store refreshed successfully")
+			}
+		case <-ctx.Done():
+			return
+		}
+	}
 }
 
 // Enrich a single car model with manufacturer and category details, like joining tables in SQL, we mathching by ID.
@@ -228,7 +229,7 @@ func InitTemplates() {
 		"itoa": strconv.Itoa,
 	}
 
-	pages := []string{"home.html", "gallery.html", "car.html", "compare.html"}
+	pages := []string{"home.html", "gallery.html", "car.html", "compare.html", "stats.html"}
 	for _, page := range pages {
 		templates[page] = template.Must(template.New(page).Funcs(funcMap).ParseFiles(
 			"templates/index.html",

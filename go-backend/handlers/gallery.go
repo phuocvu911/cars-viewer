@@ -90,4 +90,6 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		ResultCount: len(filtered),
 	}
 	render(w, "gallery.html", data)
+	//this line is for debugging purposes, to see the query parameters in the console when the gallery page is accessed
+	//fmt.Println(q)
 }

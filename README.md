@@ -39,14 +39,20 @@ make run
 
 # Extras
 
-## Search options and advanced filter
+## Search Options And Advanced Filter
 This feature shipped on top of Gallery page. The user can do free-word search, i.e `au` can return `Audi A4` car.
 
 The user can filter cars view by clicking the drop down to choose `Categories`, `Brand`, `Year` and `Drivetrain`.
 
-## Comparision feature
-Selecting cars and clicking ``Compare`` button sends `POST /compare` with selected IDs
-## Recommendation feature
+The filter bar send `GET` request to `/gallery` with data as query parameters. This is right choice for retrieving/filtering data — these are read-only operations that don't modify server state.
 
-## Page analytics
+## Comparision Feature
+Selecting cars and clicking ``Compare`` button sends `POST /compare` with selected IDs
+## Recommendation Feature
+
+## Store Analytics 
 Some data analytics about the cars that we have in the store.
+
+## Auto Refreshing Data
+
+There is a `go routines` that running in the background to update the cars data every 10 minutes. The user can see the latest data when they refresh the page.

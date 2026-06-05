@@ -1,0 +1,48 @@
+{{ define "content" }}
+
+<section id="stats" class="section stats-section">
+    <div class="section-container">
+        <div class="section-header">
+            <div class="section-badge">Data</div>
+            <h2 class="section-title">Insights & Analytics</h2>
+            <p class="section-subtitle">A bird's eye view of our car collection</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-icon">🚗</div>
+                <div class="stat-card-value">{{ .TotalModels }}</div>
+                <div class="stat-card-label">Total Models</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">🏭</div>
+                <div class="stat-card-value">{{ .TotalMfgs }}</div>
+                <div class="stat-card-label">Manufacturers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">🛒</div>
+                <div class="stat-card-value">{{ .TotalCats }}</div>
+                <div class="stat-card-label">Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">🏆</div>
+                <div class="stat-card-value">{{ .MaxHp }} HP</div>
+                <div class="stat-card-label">Most Powerful</div>
+                <div class="stat-card-sub">{{ .MaxCar }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">🏷️</div>
+                <div class="stat-card-value">{{ .MinHp }} HP</div>
+                <div class="stat-card-label">Most Efficient</div>
+                <div class="stat-card-sub">{{ .MinCar }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon">♨️</div>
+                <div class="stat-card-value">{{ .MostCommonCategory }}</div>
+                <div class="stat-card-label">Most Common Category</div>
+                <div class="stat-card-sub">{{ .MaxCategoryCount }} cars</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{ end }}
