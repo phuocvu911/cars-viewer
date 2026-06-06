@@ -17,10 +17,6 @@ type GalleryData struct {
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET requests are supported.", http.StatusMethodNotAllowed)
-		return
-	}
 	q := r.URL.Query()
 	models := enrichAll()
 

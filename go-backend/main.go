@@ -28,9 +28,9 @@ func main() {
 	// Serving css file and hooking up the handlers
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.HandleFunc("/gallery", handlers.GalleryHandler)
+	mux.HandleFunc("GET /gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
-	mux.HandleFunc("/compare", handlers.CompareHandler)
+	mux.HandleFunc("GET /compare", handlers.CompareHandler)
 	mux.HandleFunc("GET /stats", handlers.StatsHandler)
 
 	// Proxy image requests to localhost:3000

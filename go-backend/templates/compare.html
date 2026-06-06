@@ -9,7 +9,8 @@
             </p>
         </div>
 
-        <form method="POST" action="/compare" class="compare-form-wrapper">
+        <form method="GET" action="/compare" class="compare-form-wrapper">
+            <input type="hidden" name="submitted" value="1" />
             <div class="checkbox-grid compare-checkbox-grid">
                 {{ range .AllModels }}
                 <div class="checkbox-pill">
