@@ -16,8 +16,7 @@ const (
 	MODELS_ROUTE        string = "/api/models/"
 	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
 	CATEGORIES_ROUTE    string = "/api/categories/"
-
-	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
+	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
 
 // Global store for all models and categories

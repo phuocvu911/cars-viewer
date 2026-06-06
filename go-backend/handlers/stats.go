@@ -6,7 +6,7 @@ import (
 )
 
 type StatsData struct {
-	Page, Title                       string
+	Page                              string
 	TotalModels, TotalMfgs, TotalCats int
 	MaxHp, MaxCar                     string
 	MinHp, MinCar                     string
@@ -56,7 +56,6 @@ func buildStatsData() StatsData {
 	}
 	return StatsData{
 		Page:               "stats",
-		Title:              "Stats",
 		TotalModels:        totalModels,
 		TotalMfgs:          totalMfgs,
 		TotalCats:          totalCats,

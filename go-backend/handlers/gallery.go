@@ -7,7 +7,7 @@ import (
 )
 
 type GalleryData struct {
-	Page, Title                      string
+	Page                             string
 	Models                           []EnrichedCarModel
 	Categories                       []Category
 	Manufacturers                    []Manufacturer
@@ -83,11 +83,18 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := GalleryData{
-		Page: "gallery", Title: "Gallery",
-		Models: filtered, Categories: store.Categories, Manufacturers: store.Manufacturers,
-		Drivetrains: drives, Years: years,
-		Query: search, CatF: catF, MfgF: mfgF, YearF: yearF, DriveF: driveF,
-		ResultCount: len(filtered),
+		Page:          "gallery",
+		Models:        filtered,
+		Categories:    store.Categories,
+		Manufacturers: store.Manufacturers,
+		Drivetrains:   drives,
+		Years:         years,
+		Query:         search,
+		CatF:          catF,
+		MfgF:          mfgF,
+		YearF:         yearF,
+		DriveF:        driveF,
+		ResultCount:   len(filtered),
 	}
 	render(w, "gallery.html", data)
 	//this line is for debugging purposes, to see the query parameters in the console when the gallery page is accessed

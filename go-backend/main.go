@@ -31,7 +31,7 @@ func main() {
 	mux.HandleFunc("/gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("/compare", handlers.CompareHandler)
-	mux.HandleFunc("/stats", handlers.StatsHandler)
+	mux.HandleFunc("GET /stats", handlers.StatsHandler)
 
 	// Proxy image requests to localhost:3000
 	remoteURL, _ := url.Parse(handlers.API_BASE_URL)

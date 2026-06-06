@@ -5,7 +5,7 @@ import (
 )
 
 type HomeData struct {
-	Page, Tittle string
+	Page string
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -17,6 +17,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only GET requests are supported.", http.StatusMethodNotAllowed)
 		return
 	}
-	data := HomeData{Page: "home", Tittle: "Home"}
+	data := HomeData{Page: "home"}
 	render(w, "home.html", data)
 }

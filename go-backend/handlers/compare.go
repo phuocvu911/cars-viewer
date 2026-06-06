@@ -14,7 +14,7 @@ type EnrichedCarModel struct {
 }
 
 type CompareData struct {
-	Page, Title                string
+	Page                       string
 	AllModels                  []CarModel
 	Cars                       []EnrichedCarModel
 	MaxHP, MaxYear             int
@@ -22,7 +22,7 @@ type CompareData struct {
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
-	d := CompareData{Page: "compare", Title: "Compare", AllModels: store.CarModels}
+	d := CompareData{Page: "compare", AllModels: store.CarModels}
 
 	if r.Method == http.MethodPost {
 		r.ParseForm()
