@@ -84,8 +84,8 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	data := GalleryData{
 		Page:          "gallery",
 		Models:        filtered,
-		Categories:    store.Categories,
-		Manufacturers: store.Manufacturers,
+		Categories:    allCats,
+		Manufacturers: allMfgs,
 		Drivetrains:   drives,
 		Years:         years,
 		Query:         search,
