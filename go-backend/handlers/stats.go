@@ -32,7 +32,7 @@ func buildStatsData() StatsData {
 	categoryCount := make(map[int]int)
 
 	//find max/min hp/car and most common categoryID
-	for _, m := range allModels {
+	for _, m := range store.CarModels {
 		hp := m.Specifications.Horsepower
 		if hp > maxHp {
 			maxHp = hp
@@ -51,7 +51,7 @@ func buildStatsData() StatsData {
 	for categoryID, count := range categoryCount {
 		if count > maxCount {
 			maxCount = count
-			for _, cat := range allCats {
+			for _, cat := range store.Categories {
 				if cat.ID == categoryID {
 					mostCommonCategory = cat.Name
 					break
