@@ -214,6 +214,7 @@ func enrich(m CarModel) EnrichedCarModel {
 			enriched.ManufacturerName = mfg.Name
 			enriched.ManufacturerCountry = mfg.CountryOfOrigin
 			enriched.FoundingYear = mfg.FoundingYear
+			break
 		}
 	}
 

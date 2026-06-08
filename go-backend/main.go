@@ -39,5 +39,5 @@ func main() {
 	mux.Handle("/api/images/", proxy)
 
 	log.Println("AutoVault ready to see at http://localhost:8080/")
-	http.ListenAndServe(":8080", mux)
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
