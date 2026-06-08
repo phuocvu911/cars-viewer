@@ -20,9 +20,13 @@ func StatsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func buildStatsData() StatsData {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	totalModels := len(store.CarModels)
 	totalMfgs := len(store.Manufacturers)
 	totalCats := len(store.Categories)
+
 	var maxHp, minHp int
 	var maxCar, minCar string
 	categoryCount := make(map[int]int)
@@ -40,6 +44,7 @@ func buildStatsData() StatsData {
 		}
 		categoryCount[m.CategoryID]++
 	}
+
 	mostCommonCategory := ""
 	maxCount := 0
 	//match categoryID to category name

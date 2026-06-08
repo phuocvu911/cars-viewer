@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -130,23 +131,39 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 	errChan <- nil
 }
 
+// RWMutex: multiple readers can read simultaneously, but a writer gets exclusive access for lock and unlock
+var mu sync.RWMutex
+
 // Initialize the store by fetching all models and categories
 func InitStore() error {
+	var (
+		models        []CarModel
+		categories    []Category
+		manufacturers []Manufacturer
+	)
+
 	errChan := make(chan error, 3)
 	go func() {
-		errChan <- fetchDataFromAPI(MODELS_ROUTE, &store.CarModels)
+		errChan <- fetchDataFromAPI(MODELS_ROUTE, &models)
 	}()
 	go func() {
-		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &store.Categories)
+		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &categories)
 	}()
 	go func() {
-		errChan <- fetchDataFromAPI(MANUFACTURERS_ROUTE, &store.Manufacturers)
+		errChan <- fetchDataFromAPI(MANUFACTURERS_ROUTE, &manufacturers)
 	}()
 	for range 3 {
 		if err := <-errChan; err != nil {
 			return err
 		}
 	}
+
+	//lock and update the store with new data when refreshing to prevent data race
+	mu.Lock()
+	store.CarModels = models
+	store.Categories = categories
+	store.Manufacturers = manufacturers
+	mu.Unlock()
 	return nil
 }
 

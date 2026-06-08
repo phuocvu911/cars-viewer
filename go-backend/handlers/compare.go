@@ -22,8 +22,10 @@ type CompareData struct {
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
-	d := CompareData{Page: "compare", AllModels: store.CarModels}
+	mu.RLock()
+	defer mu.RUnlock()
 
+	d := CompareData{Page: "compare", AllModels: store.CarModels}
 	r.ParseForm()
 	ids := r.Form["ids"]
 	maxHP, maxYear := 0, 0

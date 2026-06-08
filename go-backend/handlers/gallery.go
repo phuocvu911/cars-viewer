@@ -17,6 +17,9 @@ type GalleryData struct {
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	q := r.URL.Query()
 	models := enrichAll()
 
