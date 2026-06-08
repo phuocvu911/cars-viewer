@@ -17,6 +17,11 @@ type GalleryData struct {
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
+	mu.RLock()
+	allCats := store.Categories
+	allMfgs := store.Manufacturers
+	mu.RUnlock()
+
 	q := r.URL.Query()
 	models := enrichAll()
 
@@ -81,8 +86,8 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	data := GalleryData{
 		Page:          "gallery",
 		Models:        filtered,
-		Categories:    store.Categories,
-		Manufacturers: store.Manufacturers,
+		Categories:    allCats,
+		Manufacturers: allMfgs,
 		Drivetrains:   drives,
 		Years:         years,
 		Query:         search,

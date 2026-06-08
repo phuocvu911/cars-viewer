@@ -22,7 +22,11 @@ type CompareData struct {
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
-	d := CompareData{Page: "compare", AllModels: store.CarModels}
+	mu.RLock()
+	allModels := store.CarModels
+	mu.RUnlock()
+
+	d := CompareData{Page: "compare", AllModels: allModels}
 
 	r.ParseForm()
 	ids := r.Form["ids"]
