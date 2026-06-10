@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 )
 
 type StatsData struct {
 	Page                              string
 	TotalModels, TotalMfgs, TotalCats int
-	MaxHp, MaxCar                     string
-	MinHp, MinCar                     string
+	MaxHp, MinHp                      int
+	MaxCar, MinCar                    string
 	MostCommonCategory                string
 	MaxCategoryCount                  int
 }
@@ -45,18 +44,19 @@ func buildStatsData() StatsData {
 		categoryCount[m.CategoryID]++
 	}
 
-	mostCommonCategory := ""
 	maxCount := 0
 	//match categoryID to category name
+	var topCatID int
 	for categoryID, count := range categoryCount {
 		if count > maxCount {
-			maxCount = count
-			for _, cat := range store.Categories {
-				if cat.ID == categoryID {
-					mostCommonCategory = cat.Name
-					break
-				}
-			}
+			maxCount, topCatID = count, categoryID
+		}
+	}
+	mostCommonCategory := ""
+	for _, cat := range store.Categories {
+		if cat.ID == topCatID {
+			mostCommonCategory = cat.Name
+			break
 		}
 	}
 	return StatsData{
@@ -64,9 +64,9 @@ func buildStatsData() StatsData {
 		TotalModels:        totalModels,
 		TotalMfgs:          totalMfgs,
 		TotalCats:          totalCats,
-		MaxHp:              strconv.Itoa(maxHp),
+		MaxHp:              maxHp,
 		MaxCar:             maxCar,
-		MinHp:              strconv.Itoa(minHp),
+		MinHp:              minHp,
 		MinCar:             minCar,
 		MostCommonCategory: mostCommonCategory,
 		MaxCategoryCount:   maxCount,

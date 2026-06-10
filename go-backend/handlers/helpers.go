@@ -68,10 +68,9 @@ type TechnicalDetails struct {
 
 // Access via /api/models/{id}
 type CarSpecs struct {
-	CarID           int `json:"id"`             // The cars own individual unique id
-	ManufactrurerID int `json:"manufacturerId"` // Holds data to the car manufacturer
-	CategoryID      int `json:"categoryId"`
-
+	CarID            int              `json:"id"`             // The cars own individual unique id
+	ManufactrurerID  int              `json:"manufacturerId"` // Holds data to the car manufacturer
+	CategoryID       int              `json:"categoryId"`
 	MakeModel        string           `json:"name"` // e.g. "Audi Q5"
 	Year             int              `json:"year"`
 	TechnicalDetails TechnicalDetails `json:"specifications"`
@@ -163,6 +162,7 @@ func InitStore() error {
 	store.CarModels = models
 	store.Categories = categories
 	store.Manufacturers = manufacturers
+	buildDerived() //rebuild the derived data after updating the store
 	mu.Unlock()
 	return nil
 }
@@ -203,40 +203,6 @@ func StoreRefresh(ctx context.Context) {
 }
 
 // Enrich a single car model with manufacturer and category details, like joining tables in SQL, we mathching by ID.
-func enrich(m CarModel) EnrichedCarModel {
-	enriched := EnrichedCarModel{
-		CarModel: m,
-	}
-
-	// Get manufacturer details from store
-	for _, mfg := range store.Manufacturers {
-		if mfg.ID == m.ManufacturerID {
-			enriched.ManufacturerName = mfg.Name
-			enriched.ManufacturerCountry = mfg.CountryOfOrigin
-			enriched.FoundingYear = mfg.FoundingYear
-			break
-		}
-	}
-
-	// Get category name from store
-	for _, cat := range store.Categories {
-		if cat.ID == m.CategoryID {
-			enriched.CategoryName = cat.Name
-			break
-		}
-	}
-
-	return enriched
-}
-
-// Enrich all car models
-func enrichAll() []EnrichedCarModel {
-	enriched := make([]EnrichedCarModel, 0, len(store.CarModels))
-	for _, model := range store.CarModels {
-		enriched = append(enriched, enrich(model))
-	}
-	return enriched
-}
 
 var templates = make(map[string]*template.Template)
 
