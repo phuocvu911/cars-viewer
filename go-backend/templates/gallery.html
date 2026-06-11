@@ -21,7 +21,6 @@
                     {{ range .Categories }}<option value="{{ .ID }}" {{ if eq $.CatF (itoa .ID) }}selected{{ end }}>{{
                         .Name }}</option>{{ end }}
                 </select>
-                <!-- {{ if eq $.CatF (itoa .ID) }}selected{{ end }} to remember user's current selection after page reload -->
                 <select name="manufacturer" class="filter-select">
                     <option value="">All Brands</option>
                     {{ range .Manufacturers }}<option value="{{ .ID }}" {{ if eq $.MfgF (itoa .ID) }}selected{{ end }}>
