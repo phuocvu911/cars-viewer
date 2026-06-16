@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"cars-viewer/cookies"
 	"net/http"
+	"sync"
 )
 
 func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,5 +35,40 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	car.Page = "gallery"
 
 	render(w, "car.html", car)
+	cookieCtx, problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
+
+	if !problem {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	var wg sync.WaitGroup
+	errChannel = make(chan error, 2)
+
+	wg.Go(func() {
+		FetchCarCategory(errChannel, &car)
+	})
+	wg.Go(func() {
+		FetchCarManufacturer(errChannel, &car)
+	})
+
+	// Wait for both to return
+	wg.Wait()
+
+	// Check for errors
+	if err := <-errChannel; err != nil {
+		http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	AddTrackingItem(&cookieCtx, &car)
+
+	// Execute template
+	err := tmpl.ExecuteTemplate(w, "index.html", car)
+
+	if err != nil {
+		http.Error(w, "Failed to execute template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 }

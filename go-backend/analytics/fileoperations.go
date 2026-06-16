@@ -10,7 +10,7 @@ import (
 
 func AppendJSONL(filePath string, record Entry) error {
 
-	if record.Id == nil {
+	if record.ShortID == nil || record.LongID == nil {
 		return errors.New("Entry does not include ID.")
 	}
 
@@ -65,11 +65,11 @@ func LoadAndAggregate(filePath string) (*UserPreferences, error) {
 			return nil, err
 		}
 
-		if entry.Id == nil {
+		if entry.ShortID == nil {
 			continue
 		}
 
-		userId := *entry.Id
+		userId := *entry.ShortID
 
 		_, found := userMap[userId]
 

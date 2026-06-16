@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cars-viewer/cookies"
 	"cars-viewer/handlers"
 	"context"
 	"log"
@@ -32,6 +33,19 @@ func main() {
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
 	mux.HandleFunc("GET /compare", handlers.CompareHandler)
 	mux.HandleFunc("GET /stats", handlers.StatsHandler)
+	// Cookies
+	mux.HandleFunc("GET /allow-cookies", handlers.AllowedCookiesHandler)
+	mux.HandleFunc("GET /disallow-cookies", handlers.NotAllowedCookiesHandler)
+
+	// file server
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	//mux.HandleFunc("/", handlers.HomeHandler)
+	//mux.HandleFunc("GET "+handlers.CAR_ENDPOINT, handlers.CarDetailsHandler)
+	mux.Handle("GET "+handlers.CAR_ENDPOINT, cookies.AddCookieContext(http.HandlerFunc(handlers.CarDetailsHandler)))
+
+	mux.HandleFunc("/compare", handlers.CompareHandler)
 
 	// Proxy image requests to localhost:3000
 	remoteURL, _ := url.Parse(handlers.API_BASE_URL)

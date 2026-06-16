@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+	"cars-viewer/analytics"
+	"cars-viewer/cookies"
 	"encoding/json"
 	"errors"
 	"html/template"
@@ -21,47 +23,29 @@ const (
 	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
 
-// Return cookie value
-func AllowedToTrack(r *http.Request) (bool, error) {
-	cookie, err := r.Cookie(ACCEPTED_COOKIES_COOKIE_NAME)
+// Add tracking data to the file
+func AddTrackingItem(cookie_input *cookies.CookieCtx, car_obj *Car) error {
 
-	if err != nil {
-		return false, err
+	// Check if any cookie is missing
+	if cookie_input.AllowTracking == nil || cookie_input.LongCookie == nil || cookie_input.ShortCookie == nil {
+		return errors.New("nil cookie found.")
 	}
 
-	return cookie.Value == "true", nil
-
-}
-
-func GetTrackingCookie(r *http.Request) (string, error) {
-	cookie, err := r.Cookie(TRACKING_COOKIE_NAME)
-
-	if err != nil {
-		return "", err
+	// Check if any cookie is missing Value field
+	if cookie_input.AllowTracking.Value == "" || cookie_input.LongCookie.Value == "" || cookie_input.ShortCookie.Value == "" {
+		return errors.New("Value without value found.")
 	}
 
-	return cookie.Value, nil
-
-}
-
-// Generate random cookie with format "xxxx-xxxx..."
-// The cookie can contain characters ranging from a to z
-// lenght 3 equals to xxxx-xxxx-xxxx
-func GenerateCookie(lenght int) string {
-
-	out := ""
-	for i := 0; i < lenght; i++ {
-		func() {
-			for j := 0; j < 4; j++ {
-				// Returns random letters between byte value 97 and 122 (a - z)
-				out += string(byte(rand.IntN(122-97) + 97))
-			}
-			out += "-"
-
-		}()
+	// Avoid memory errors by verifying the struct exists
+	if analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value] == nil {
+		analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value] = &analytics.CookieData{}
 	}
-	// Remove last ugly line
-	return out[:len(out)-1]
+
+	analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].AddEntry(cookie_input.LongCookie.Value, cookie_input.ShortCookie.Value, car_obj.ManufactDetails.Make, car_obj.Category.Name)
+	log.Println(analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].UsualBrand)
+	log.Println(analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].UsualChassis)
+	return nil
+
 }
 
 // Global store for all models and categories
