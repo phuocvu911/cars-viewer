@@ -7,7 +7,7 @@ import (
 )
 
 type GalleryData struct {
-	Page, Title                      string
+	Page                             string
 	Models                           []EnrichedCarModel
 	Categories                       []Category
 	Manufacturers                    []Manufacturer
@@ -17,43 +17,37 @@ type GalleryData struct {
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET requests are supported.", http.StatusMethodNotAllowed)
-		return
-	}
-	q := r.URL.Query()
-	models := enrichAll()
+	mu.RLock()
+	defer mu.RUnlock()
 
+	models := derived.EnrichedModels
+	q := r.URL.Query()
 	catF := q.Get("category")
 	mfgF := q.Get("manufacturer")
 	yearF := q.Get("year")
 	driveF := q.Get("drivetrain")
 	search := q.Get("q")
 
+	catID, hasCat := atoiOK(catF)
+	mfgID, hasMfg := atoiOK(mfgF)
+	yearV, hasYear := atoiOK(yearF)
+
 	filtered := make([]EnrichedCarModel, 0, len(models))
 	for _, m := range models {
-		if catF != "" {
-			id, _ := strconv.Atoi(catF)
-			if m.CategoryID != id {
-				continue
-			}
+		if hasCat && m.CategoryID != catID {
+			continue
 		}
-		if mfgF != "" {
-			id, _ := strconv.Atoi(mfgF)
-			if m.ManufacturerID != id {
-				continue
-			}
+		if hasMfg && m.ManufacturerID != mfgID {
+			continue
 		}
-		if yearF != "" {
-			y, _ := strconv.Atoi(yearF)
-			if m.Year != y {
-				continue
-			}
+		if hasYear && m.Year != yearV {
+			continue
 		}
 		if driveF != "" && !strings.EqualFold(m.Specifications.Drivetrain, driveF) {
 			continue
 		}
 		if search != "" {
+			//free word search across multiple fields, case insensitive.
 			s := strings.ToLower(search)
 			if !strings.Contains(strings.ToLower(m.Name), s) &&
 				!strings.Contains(strings.ToLower(m.ManufacturerName), s) &&
@@ -66,30 +60,32 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 		filtered = append(filtered, m)
 	}
 
-	// Collect unique values for filter dropdowns
-	yearSet := map[string]bool{}
-	driveSet := map[string]bool{}
-	for _, m := range models {
-		yearSet[strconv.Itoa(m.Year)] = true
-		driveSet[m.Specifications.Drivetrain] = true
-	}
-	years := make([]string, 0)
-	for y := range yearSet {
-		years = append(years, y)
-	}
-	drives := make([]string, 0)
-	for d := range driveSet {
-		drives = append(drives, d)
-	}
-
 	data := GalleryData{
-		Page: "gallery", Title: "Gallery",
-		Models: filtered, Categories: store.Categories, Manufacturers: store.Manufacturers,
-		Drivetrains: drives, Years: years,
-		Query: search, CatF: catF, MfgF: mfgF, YearF: yearF, DriveF: driveF,
-		ResultCount: len(filtered),
+		Page:          "gallery",
+		Models:        filtered,
+		Categories:    store.Categories,
+		Manufacturers: store.Manufacturers,
+		Drivetrains:   derived.Drivetrains,
+		Years:         derived.Years,
+		Query:         search,
+		CatF:          catF,
+		MfgF:          mfgF,
+		YearF:         yearF,
+		DriveF:        driveF,
+		ResultCount:   len(filtered),
 	}
 	render(w, "gallery.html", data)
 	//this line is for debugging purposes, to see the query parameters in the console when the gallery page is accessed
 	//fmt.Println(q)
+}
+
+func atoiOK(s string) (int, bool) {
+	if s == "" {
+		return 0, false
+	}
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, false
+	}
+	return n, true
 }

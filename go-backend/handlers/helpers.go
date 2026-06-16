@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -16,8 +17,7 @@ const (
 	MODELS_ROUTE        string = "/api/models/"
 	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
 	CATEGORIES_ROUTE    string = "/api/categories/"
-
-	IMG_PATH_PREFIX string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
+	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
 )
 
 // Global store for all models and categories
@@ -68,10 +68,9 @@ type TechnicalDetails struct {
 
 // Access via /api/models/{id}
 type CarSpecs struct {
-	CarID           int `json:"id"`             // The cars own individual unique id
-	ManufactrurerID int `json:"manufacturerId"` // Holds data to the car manufacturer
-	CategoryID      int `json:"categoryId"`
-
+	CarID            int              `json:"id"`             // The cars own individual unique id
+	ManufactrurerID  int              `json:"manufacturerId"` // Holds data to the car manufacturer
+	CategoryID       int              `json:"categoryId"`
 	MakeModel        string           `json:"name"` // e.g. "Audi Q5"
 	Year             int              `json:"year"`
 	TechnicalDetails TechnicalDetails `json:"specifications"`
@@ -131,23 +130,40 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 	errChan <- nil
 }
 
+// RWMutex: multiple readers can read simultaneously, but a writer gets exclusive access for lock and unlock
+var mu sync.RWMutex
+
 // Initialize the store by fetching all models and categories
 func InitStore() error {
+	var (
+		models        []CarModel
+		categories    []Category
+		manufacturers []Manufacturer
+	)
+
 	errChan := make(chan error, 3)
 	go func() {
-		errChan <- fetchDataFromAPI(MODELS_ROUTE, &store.CarModels)
+		errChan <- fetchDataFromAPI(MODELS_ROUTE, &models)
 	}()
 	go func() {
-		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &store.Categories)
+		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &categories)
 	}()
 	go func() {
-		errChan <- fetchDataFromAPI(MANUFACTURERS_ROUTE, &store.Manufacturers)
+		errChan <- fetchDataFromAPI(MANUFACTURERS_ROUTE, &manufacturers)
 	}()
 	for range 3 {
 		if err := <-errChan; err != nil {
 			return err
 		}
 	}
+
+	//lock and update the store with new data when refreshing to prevent data race
+	mu.Lock()
+	store.CarModels = models
+	store.Categories = categories
+	store.Manufacturers = manufacturers
+	buildDerived() //rebuild the derived data after updating the store
+	mu.Unlock()
 	return nil
 }
 
@@ -187,39 +203,6 @@ func StoreRefresh(ctx context.Context) {
 }
 
 // Enrich a single car model with manufacturer and category details, like joining tables in SQL, we mathching by ID.
-func enrich(m CarModel) EnrichedCarModel {
-	enriched := EnrichedCarModel{
-		CarModel: m,
-	}
-
-	// Get manufacturer details from store
-	for _, mfg := range store.Manufacturers {
-		if mfg.ID == m.ManufacturerID {
-			enriched.ManufacturerName = mfg.Name
-			enriched.ManufacturerCountry = mfg.CountryOfOrigin
-			enriched.FoundingYear = mfg.FoundingYear
-		}
-	}
-
-	// Get category name from store
-	for _, cat := range store.Categories {
-		if cat.ID == m.CategoryID {
-			enriched.CategoryName = cat.Name
-			break
-		}
-	}
-
-	return enriched
-}
-
-// Enrich all car models
-func enrichAll() []EnrichedCarModel {
-	enriched := make([]EnrichedCarModel, 0, len(store.CarModels))
-	for _, model := range store.CarModels {
-		enriched = append(enriched, enrich(model))
-	}
-	return enriched
-}
 
 var templates = make(map[string]*template.Template)
 

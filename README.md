@@ -47,7 +47,7 @@ The user can filter cars view by clicking the drop down to choose `Categories`, 
 The filter bar send `GET` request to `/gallery` with data as query parameters. This is right choice for retrieving/filtering data — these are read-only operations that don't modify server state.
 
 ## Comparision Feature
-Selecting cars and clicking ``Compare`` button sends `POST /compare` with selected IDs
+Selecting cars and clicking ``Compare`` button sends `GET /compare` with selected IDs to retrieve detailed information about those cars for side-by-side comparison.
 ## Recommendation Feature
 
 ## Store Analytics 

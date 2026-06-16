@@ -14,7 +14,7 @@ type EnrichedCarModel struct {
 }
 
 type CompareData struct {
-	Page, Title                string
+	Page                       string
 	AllModels                  []CarModel
 	Cars                       []EnrichedCarModel
 	MaxHP, MaxYear             int
@@ -22,34 +22,36 @@ type CompareData struct {
 }
 
 func CompareHandler(w http.ResponseWriter, r *http.Request) {
-	d := CompareData{Page: "compare", Title: "Compare", AllModels: store.CarModels}
+	mu.RLock()
+	defer mu.RUnlock()
 
-	if r.Method == http.MethodPost {
-		r.ParseForm()
-		ids := r.Form["ids"]
-		maxHP, maxYear := 0, 0
-		for _, idStr := range ids {
-			id, err := strconv.Atoi(idStr)
-			if err != nil {
-				continue
-			}
-			for _, m := range d.AllModels {
-				if m.ID == id {
-					em := enrich(m)
-					d.Cars = append(d.Cars, em)
-					if em.Specifications.Horsepower > maxHP {
-						maxHP = em.Specifications.Horsepower
-					}
-					if em.Year > maxYear {
-						maxYear = em.Year
-					}
-					break
+	d := CompareData{Page: "compare", AllModels: store.CarModels}
+	query := r.URL.Query()
+	ids := query["ids"] // multiple values for ?ids=1&ids=2
+	maxHP, maxYear := 0, 0
+
+	for _, idStr := range ids {
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			continue
+		}
+		for _, em := range derived.EnrichedModels {
+			if em.ID == id {
+				d.Cars = append(d.Cars, em)
+				if em.Specifications.Horsepower > maxHP {
+					maxHP = em.Specifications.Horsepower
 				}
+				if em.Year > maxYear {
+					maxYear = em.Year
+				}
+				break
 			}
 		}
-		d.MaxHP = maxHP
-		d.MaxYear = maxYear
-		d.HasResults = (len(d.Cars) >= 2 && len(d.Cars) <= 4)
+	}
+	d.MaxHP = maxHP
+	d.MaxYear = maxYear
+	d.HasResults = (len(d.Cars) >= 2 && len(d.Cars) <= 4)
+	if !d.HasResults && query.Get("submitted") == "1" {
 		d.FilterReceived = true
 	}
 	render(w, "compare.html", d)

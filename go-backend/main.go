@@ -22,22 +22,22 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go handlers.StoreRefresh(ctx)
+
 	mux := http.NewServeMux()
 
 	// Serving css file and hooking up the handlers
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.HandleFunc("/gallery", handlers.GalleryHandler)
+	mux.HandleFunc("GET /gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /car/", handlers.CarDetailsHandler)
-	mux.HandleFunc("/compare", handlers.CompareHandler)
-	mux.HandleFunc("/stats", handlers.StatsHandler)
+	mux.HandleFunc("GET /compare", handlers.CompareHandler)
+	mux.HandleFunc("GET /stats", handlers.StatsHandler)
 
 	// Proxy image requests to localhost:3000
 	remoteURL, _ := url.Parse(handlers.API_BASE_URL)
 	proxy := httputil.NewSingleHostReverseProxy(remoteURL)
-	mux.HandleFunc("/api/images/", func(w http.ResponseWriter, r *http.Request) {
-		proxy.ServeHTTP(w, r)
-	})
+	mux.Handle("/api/images/", proxy)
+
 	log.Println("AutoVault ready to see at http://localhost:8080/")
-	http.ListenAndServe(":8080", mux)
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
