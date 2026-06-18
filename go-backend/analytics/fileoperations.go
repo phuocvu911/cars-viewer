@@ -10,8 +10,8 @@ import (
 
 func AppendJSONL(filePath string, record Entry) error {
 
-	if record.Id == nil {
-		return errors.New("Entry does not include ID.")
+	if record.ShortID == nil || record.LongID == nil {
+		return errors.New("Entry is missing ID.")
 	}
 
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
