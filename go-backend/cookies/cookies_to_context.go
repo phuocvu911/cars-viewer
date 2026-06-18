@@ -39,17 +39,15 @@ func AddCookieContext(next http.Handler) http.Handler {
 		cookieCtx, err := ParseCookieCtx(r)
 
 		if err != nil {
-			if errors.Is(err, http.ErrNoCookie) {
-				log.Printf("No cookie set for allowing / disallowing cookies. %v", err)
-				http.Error(w, "Cookies are not allowed or disallowed. ", http.StatusBadRequest)
+			if !errors.Is(err, http.ErrNoCookie) {
+				log.Printf("ParseCookieCtx error: %v", err)
+				http.Error(w, "Middleware failed. ", http.StatusInternalServerError)
 				return
 			}
-			log.Printf("ParseCookieCtx error: %v", err)
-			http.Error(w, "Middleware failed. ", http.StatusInternalServerError)
-			return
+			// Accept ErrNoCookie
 		}
 
-		// Add the context to the previous context using context.WithValue()
+		// Add the context to the current context by using context.WithValue()
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), CookieCtxKey{}, cookieCtx)))
 
 	})
