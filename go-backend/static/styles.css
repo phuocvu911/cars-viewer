@@ -1,3 +1,21 @@
+#cookie_div {
+    position: fixed;
+    top: 80%;
+    left: 25%;
+    z-index: 100;
+
+    background-color: #6c5ce7;
+    color: #e8e8f0;
+    padding: 40px;
+    border-radius: 12px;
+    
+    width: 50%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+
+
 *,
 *::before,
 *::after {
@@ -54,7 +72,7 @@ a {
 }
 
 img {
-    max-width: 100%;
+    max-width: 70%;
     display: block
 }
 
