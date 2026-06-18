@@ -20,6 +20,10 @@ const (
 	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
 	CATEGORIES_ROUTE    string = "/api/categories/"
 	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
+	CAR_ENDPOINT        string = "/api/car/"
+
+	// ROUTES FOR THE :8080/
+	LOCAL_CARS_ROUTE string = "/car/"
 )
 
 // Add tracking data to the file
@@ -40,9 +44,7 @@ func AddTrackingItem(cookie_input *cookies.CookieCtx, car_obj *Car) error {
 		analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value] = &analytics.CookieData{}
 	}
 
-	analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].AddEntry(cookie_input.LongCookie.Value, cookie_input.ShortCookie.Value, car_obj.ManufactDetails.Make, car_obj.Category.Name)
-	log.Println(analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].UsualBrand)
-	log.Println(analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].UsualChassis)
+	analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].AddEntry(cookie_input.LongCookie.Value, cookie_input.ShortCookie.Value, car_obj.ManufactDetails.Name, car_obj.Category.Name)
 	return nil
 
 }
@@ -160,7 +162,7 @@ func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
 		return
 	}
 
-	err := FetchDataFromAPIByRouteAndID(MANUFACTURER_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+	err := FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
