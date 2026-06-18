@@ -5,6 +5,16 @@ import (
 	"time"
 )
 
+// Return the long cookie without changing it. This is to avoid a bug where a client can have only short term cookie with permission.
+func WriteLongCookieHeader(w http.ResponseWriter, cookie *http.Cookie) {
+
+	if cookie != nil {
+		cookie.Path = "/"
+		http.SetCookie(w, cookie)
+	}
+
+}
+
 // Creates a tracking allowance cookie to the request
 // Call after prompting agreement for data collection.
 func SetTrackingAllowanceAndLongtermIDCookies(w http.ResponseWriter, allow bool) {
