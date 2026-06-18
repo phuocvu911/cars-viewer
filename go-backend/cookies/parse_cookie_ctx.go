@@ -52,7 +52,7 @@ func ParseCookieCtx(r *http.Request) (CookieCtx, error) {
 
 	// If the cookie is found, but the value is not "true"
 	if track.Value != "true" {
-		return CookieCtx{AllowTracking: &http.Cookie{Value: "false", Expires: time.Now().Add(TRACKING_COOKIE_EXP_NOT_ALLOWED)}}, nil
+		return CookieCtx{AllowTracking: &http.Cookie{Name: ALLOW_TRACKING_COOKIE_NAME, Value: "false", Expires: time.Now().Add(TRACKING_COOKIE_EXP_NOT_ALLOWED)}}, nil
 	}
 
 	long_cookie, err := GetLongTrackingCookie(r)
@@ -67,8 +67,8 @@ func ParseCookieCtx(r *http.Request) (CookieCtx, error) {
 		}
 
 		// Tracking allowed, Cookie not found = SetNewCookie true
-		long_cookie = &http.Cookie{Value: GenerateCookie(DEFAULT_COOKIE_LEN), Expires: time.Now().Add(TRACKING_COOKIE_EXP_ALLOWED)}
-		short_cookie = &http.Cookie{Value: GenerateCookie(DEFAULT_COOKIE_LEN), Expires: time.Now().Add(SHORT_TERM_USER_TRACKING_COOKIE_EXP)}
+		long_cookie = &http.Cookie{Name: LONG_USER_TRACKING_COOKIE_NAME, Value: GenerateCookie(DEFAULT_COOKIE_LEN), Expires: time.Now().Add(TRACKING_COOKIE_EXP_ALLOWED)}
+		short_cookie = &http.Cookie{Name: SHORT_USER_TRACKING_COOKIE_NAME, Value: GenerateCookie(DEFAULT_COOKIE_LEN), Expires: time.Now().Add(SHORT_TERM_USER_TRACKING_COOKIE_EXP)}
 
 		return CookieCtx{AllowTracking: track, LongCookie: long_cookie, ShortCookie: short_cookie}, nil
 	}
@@ -81,7 +81,7 @@ func ParseCookieCtx(r *http.Request) (CookieCtx, error) {
 			return CookieCtx{}, err
 		}
 		// Tracking allowed, Cookie not found = SetNewCookie true
-		short_cookie = &http.Cookie{Value: GenerateCookie(DEFAULT_COOKIE_LEN), Expires: time.Now().Add(SHORT_TERM_USER_TRACKING_COOKIE_EXP)}
+		short_cookie = &http.Cookie{Name: SHORT_USER_TRACKING_COOKIE_NAME, Value: GenerateCookie(DEFAULT_COOKIE_LEN), Expires: time.Now().Add(SHORT_TERM_USER_TRACKING_COOKIE_EXP)}
 	}
 
 	return CookieCtx{AllowTracking: track, LongCookie: long_cookie, ShortCookie: short_cookie}, nil

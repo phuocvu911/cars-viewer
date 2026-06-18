@@ -61,7 +61,11 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println(car)
-	AddTrackingItem(&cookieCtx, &car)
 
+	if cookieCtx.AllowTracking.Value == "true" {
+		cookies.UpdateShortCookie(w, cookieCtx.ShortCookie)
+		AddTrackingItem(&cookieCtx, &car)
+	}
+	// http.SetCookie(w, cookieCtx.ShortCookie.Name)
 	render(w, "car.html", car)
 }

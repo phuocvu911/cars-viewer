@@ -48,12 +48,9 @@ func AddCookieContext(next http.Handler) http.Handler {
 			http.Error(w, "Middleware failed. ", http.StatusInternalServerError)
 			return
 		}
+
 		// Add the context to the previous context using context.WithValue()
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), CookieCtxKey{}, cookieCtx)))
-
-		if cookieCtx.AllowTracking.Value == "true" {
-			UpdateShortCookie(w, cookieCtx.ShortCookie)
-		}
 
 	})
 }
