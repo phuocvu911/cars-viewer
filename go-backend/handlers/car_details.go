@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"cars-viewer/cookies"
-	"log"
 	"net/http"
 	"sync"
 )
@@ -60,10 +59,10 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Println(car)
 
-	if cookieCtx.AllowTracking.Value == "true" {
+	if cookieCtx.AllowTracking != nil && cookieCtx.AllowTracking.Value == "true" {
 		cookies.UpdateShortCookie(w, cookieCtx.ShortCookie)
+		cookies.WriteLongCookieHeader(w, cookieCtx.LongCookie)
 		AddTrackingItem(&cookieCtx, &car)
 	}
 	// http.SetCookie(w, cookieCtx.ShortCookie.Name)
