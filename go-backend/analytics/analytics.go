@@ -31,8 +31,6 @@ type UserPreferences struct {
 // Adds entry to the JSONL and to in-memory struct
 func (self *CookieData) AddEntry(user_long_id, user_short_id, brand, chassis string) error {
 
-// Adds entry to the JSON and to inmemory struct
-func (self *CookieData) AddEntry(id, brand, chassis string) error {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 
@@ -41,7 +39,7 @@ func (self *CookieData) AddEntry(id, brand, chassis string) error {
 
 	new_data.ShortID = &user_short_id
 	new_data.LongID = &user_long_id
-	new_data.Id = &id
+
 	if err := AppendJSONL(ANALYTICS_FILE_PATH, new_data); err != nil {
 		return err
 	}
