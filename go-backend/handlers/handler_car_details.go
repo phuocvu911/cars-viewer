@@ -34,12 +34,15 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
 	car.Page = "gallery"
 
+	// -----------------------
+	// Use for reading context the previous handler has passed.
 	cookieCtx, problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
 
 	if !problem {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	// -----------------------
 
 	var wg sync.WaitGroup
 	errChannel = make(chan error, 2)
@@ -65,6 +68,6 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		cookies.WriteLongCookieHeader(w, cookieCtx.LongCookie)
 		AddTrackingItem(&cookieCtx, &car)
 	}
-	// http.SetCookie(w, cookieCtx.ShortCookie.Name)
+
 	render(w, "car.html", car)
 }

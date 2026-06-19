@@ -14,6 +14,7 @@ type GalleryData struct {
 	Drivetrains, Years               []string
 	Query, CatF, MfgF, YearF, DriveF string
 	ResultCount                      int
+	Recommendations                  []CarSpecs
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,6 +34,7 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	yearV, hasYear := atoiOK(yearF)
 
 	filtered := make([]EnrichedCarModel, 0, len(models))
+
 	for _, m := range models {
 		if hasCat && m.CategoryID != catID {
 			continue
@@ -61,19 +63,30 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := GalleryData{
-		Page:          "gallery",
-		Models:        filtered,
-		Categories:    store.Categories,
-		Manufacturers: store.Manufacturers,
-		Drivetrains:   derived.Drivetrains,
-		Years:         derived.Years,
-		Query:         search,
-		CatF:          catF,
-		MfgF:          mfgF,
-		YearF:         yearF,
-		DriveF:        driveF,
-		ResultCount:   len(filtered),
+		Page:            "gallery",
+		Models:          filtered,
+		Categories:      store.Categories,
+		Manufacturers:   store.Manufacturers,
+		Drivetrains:     derived.Drivetrains,
+		Years:           derived.Years,
+		Query:           search,
+		CatF:            catF,
+		MfgF:            mfgF,
+		YearF:           yearF,
+		DriveF:          driveF,
+		ResultCount:     len(filtered),
+		Recommendations: nil,
 	}
+
+	// I had to do this in a funny way due to mutex issue with not passing a pointer.
+	// -----------------
+	recom, err := FetchRecommendations(r)
+
+	if err == nil {
+		data.Recommendations = recom
+
+	}
+	// -----------------
 	render(w, "gallery.html", data)
 	//this line is for debugging purposes, to see the query parameters in the console when the gallery page is accessed
 	//fmt.Println(q)

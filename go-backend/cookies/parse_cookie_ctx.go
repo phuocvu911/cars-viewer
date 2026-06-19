@@ -47,7 +47,7 @@ func ParseCookieCtx(r *http.Request) (CookieCtx, error) {
 
 	// If the allowance does not exist at all, return error instead of defaulting to false.
 	if err != nil {
-		return CookieCtx{}, err
+		return CookieCtx{AllowTracking: &http.Cookie{Name: ALLOW_TRACKING_COOKIE_NAME, Value: "false", Expires: time.Now().Add(TRACKING_COOKIE_EXP_NOT_ALLOWED)}, ShortCookie: &http.Cookie{}}, err
 	}
 
 	// If the cookie is found, but the value is not "true"

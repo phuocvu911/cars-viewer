@@ -15,12 +15,14 @@ import (
 )
 
 const (
-	API_BASE_URL        string = "http://localhost:3000"
-	MODELS_ROUTE        string = "/api/models/"
-	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
-	CATEGORIES_ROUTE    string = "/api/categories/"
-	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
-	CAR_ENDPOINT        string = "/api/car/"
+	API_BASE_URL             string = "http://localhost:3000"
+	MODELS_ROUTE             string = "/api/models/"
+	MODELS__BY_BRAND_ROUTE   string = "/api/models/brand/"
+	MODELS__BY_CHASSIS_ROUTE string = "/api/models/chassis/"
+	MANUFACTURERS_ROUTE      string = "/api/manufacturers/"
+	CATEGORIES_ROUTE         string = "/api/categories/"
+	IMG_PATH_PREFIX          string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
+	CAR_ENDPOINT             string = "/api/car/"
 
 	// ROUTES FOR THE :8080/
 	LOCAL_CARS_ROUTE string = "/car/"
