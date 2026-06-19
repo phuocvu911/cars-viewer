@@ -29,14 +29,14 @@ func main() {
 	// Serving css file and hooking up the handlers
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/", handlers.HomeHandler)
-	mux.HandleFunc("GET /gallery", handlers.GalleryHandler)
 	mux.HandleFunc("GET /compare", handlers.CompareHandler)
 	mux.HandleFunc("GET /stats", handlers.StatsHandler)
-	mux.Handle("GET "+handlers.LOCAL_CARS_ROUTE, cookies.AddCookieContext(http.HandlerFunc(handlers.CarDetailsHandler)))
 
-	// Cookies
+	// Cookie-related
 	mux.HandleFunc("GET /allow-cookies", handlers.AllowedCookiesHandler)
 	mux.HandleFunc("GET /disallow-cookies", handlers.NotAllowedCookiesHandler)
+	mux.Handle("GET /gallery", cookies.AddCookieContext(http.HandlerFunc(handlers.GalleryHandler)))
+	mux.Handle("GET "+handlers.LOCAL_CARS_ROUTE, cookies.AddCookieContext(http.HandlerFunc(handlers.CarDetailsHandler)))
 
 	// file server
 	fs := http.FileServer(http.Dir("./static"))
