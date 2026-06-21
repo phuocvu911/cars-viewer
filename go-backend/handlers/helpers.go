@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"cars-viewer/analytics"
+	"cars-viewer/cookies"
 	"context"
 	"encoding/json"
 	"errors"
@@ -18,7 +20,34 @@ const (
 	MANUFACTURERS_ROUTE string = "/api/manufacturers/"
 	CATEGORIES_ROUTE    string = "/api/categories/"
 	IMG_PATH_PREFIX     string = "/api/images/" // Used for the reverse proxy endpoint and prefixing images
+	CAR_ENDPOINT        string = "/api/car/"
+
+	// ROUTES FOR THE :8080/
+	LOCAL_CARS_ROUTE string = "/car/"
 )
+
+// Add tracking data to the file
+func AddTrackingItem(cookie_input *cookies.CookieCtx, car_obj *Car) error {
+
+	// Check if any cookie is missing
+	if cookie_input.AllowTracking == nil || cookie_input.LongCookie == nil || cookie_input.ShortCookie == nil {
+		return errors.New("nil cookie found.")
+	}
+
+	// Check if any cookie is missing Value field
+	if cookie_input.AllowTracking.Value == "" || cookie_input.LongCookie.Value == "" || cookie_input.ShortCookie.Value == "" {
+		return errors.New("Value without value found.")
+	}
+
+	// Avoid memory errors by verifying the struct exists
+	if analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value] == nil {
+		analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value] = &analytics.CookieData{}
+	}
+
+	analytics.LiveCookieData.Data[cookie_input.ShortCookie.Value].AddEntry(cookie_input.LongCookie.Value, cookie_input.ShortCookie.Value, car_obj.ManufactDetails.Name, car_obj.Category.Name)
+	return nil
+
+}
 
 // Global store for all models and categories
 type DataStore struct {
@@ -49,6 +78,7 @@ type Car struct {
 	DataPerID       CarSpecs
 	ManufactDetails Manufacturer
 	Page            string
+	Category        Category
 }
 
 // Access via /api/manufacturers/{id}
@@ -102,9 +132,9 @@ func FetchDataFromAPIByRouteAndID(route string, id int, DataModel any) error {
 	return nil
 }
 
-// Use to fetch all related information to Car page.
-// Second request needs manufacturer id so it cannot be concurrent
-func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
+// Use to fetch Car by id.
+// Basically fetch CarSpecs struct.
+func FetchCarByID(car_id string, errChan chan<- error, carpointer *Car) {
 
 	int_id, err := strconv.Atoi(car_id)
 
@@ -119,8 +149,20 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 		errChan <- err
 		return
 	}
+	// Add nil to the channel to confirm all went smoothly
+	errChan <- nil
+}
 
-	err = FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
+// Used for enriching Car object concurrently with FetchCarCategory
+// No need to use sync.Mutex
+func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
+
+	if carpointer.DataPerID.ManufactrurerID < 1 {
+		errChan <- errors.New("Manufactrurer ID has not been assigned or is invalid. ")
+		return
+	}
+
+	err := FetchDataFromAPIByRouteAndID(MANUFACTURERS_ROUTE, carpointer.DataPerID.ManufactrurerID, &carpointer.ManufactDetails)
 
 	if err != nil {
 		errChan <- err
@@ -128,6 +170,26 @@ func FetchCar(car_id string, errChan chan<- error, carpointer *Car) {
 	}
 
 	errChan <- nil
+
+}
+
+// Used for enriching Car object concurrently with FetchCarManufacturer
+// No need to use sync.Mutex
+func FetchCarCategory(errChan chan<- error, carpointer *Car) {
+
+	if carpointer.DataPerID.CategoryID < 1 {
+		errChan <- errors.New("Category ID has not been assigned or is invalid. ")
+	}
+
+	err := FetchDataFromAPIByRouteAndID(CATEGORIES_ROUTE, carpointer.DataPerID.CategoryID, &carpointer.Category)
+
+	if err != nil {
+		errChan <- err
+		return
+	}
+
+	errChan <- nil
+
 }
 
 // RWMutex: multiple readers can read simultaneously, but a writer gets exclusive access for lock and unlock

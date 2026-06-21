@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"cars-viewer/cookies"
 	"net/http"
+	"sync"
 )
 
 func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
@@ -11,7 +13,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	car_id := r.URL.Path[len("/car/"):]
+	car_id := r.URL.Path[len(LOCAL_CARS_ROUTE):]
 
 	if len(car_id) == 0 || len(car_id) > 10 {
 		http.Error(w, "Bad request.", http.StatusBadRequest)
@@ -22,7 +24,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	errChannel := make(chan error, 1)
 
-	go FetchCar(car_id, errChannel, &car)
+	FetchCarByID(car_id, errChannel, &car)
 
 	if err := <-errChannel; err != nil {
 		http.Error(w, "Failed to fetch backend data: "+err.Error(), http.StatusInternalServerError)
@@ -32,6 +34,37 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	car.DataPerID.ImgSrc = IMG_PATH_PREFIX + car.DataPerID.ImgSrc
 	car.Page = "gallery"
 
-	render(w, "car.html", car)
+	cookieCtx, problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
 
+	if !problem {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	var wg sync.WaitGroup
+	errChannel = make(chan error, 2)
+
+	wg.Go(func() {
+		FetchCarCategory(errChannel, &car)
+	})
+	wg.Go(func() {
+		FetchCarManufacturer(errChannel, &car)
+	})
+
+	// Wait for both to return
+	wg.Wait()
+
+	// Check for errors
+	if err := <-errChannel; err != nil {
+		http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if cookieCtx.AllowTracking != nil && cookieCtx.AllowTracking.Value == "true" {
+		cookies.UpdateShortCookie(w, cookieCtx.ShortCookie)
+		cookies.WriteLongCookieHeader(w, cookieCtx.LongCookie)
+		AddTrackingItem(&cookieCtx, &car)
+	}
+	// http.SetCookie(w, cookieCtx.ShortCookie.Name)
+	render(w, "car.html", car)
 }
