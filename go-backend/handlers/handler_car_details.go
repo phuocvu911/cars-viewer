@@ -36,9 +36,9 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// -----------------------
 	// Use for reading context the previous handler has passed.
-	cookieCtx, problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
+	cookieCtx, no_problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
 
-	if !problem {
+	if !no_problem {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -57,16 +57,35 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Wait for both to return
 	wg.Wait()
 
+	close(errChannel)
+
 	// Check for errors
-	if err := <-errChannel; err != nil {
-		http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
-		return
+	for err := range errChannel {
+		if err != nil {
+			http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	if cookieCtx.AllowTracking != nil && cookieCtx.AllowTracking.Value == "true" {
-		cookies.UpdateShortCookie(w, cookieCtx.ShortCookie)
-		cookies.WriteLongCookieHeader(w, cookieCtx.LongCookie)
+	if cookieCtx.AllowTracking == nil || cookieCtx.AllowTracking.Value == "false" {
+
+		// Check if all cookies needs to be revoked
+		if cookieCtx.DeleteAllCookies {
+			cookies.SetDeleteAllCookiesHeader(w)
+		}
+
+		render(w, "car.html", car)
+		return
+
+	}
+
+	if cookieCtx.AllowTracking.Value == "true" {
 		AddTrackingItem(&cookieCtx, &car)
+		http.SetCookie(w, cookieCtx.ShortCookie)
+	}
+
+	if cookieCtx.ReturnAllCookies {
+		cookies.WriteLongCookieHeader(w, cookieCtx.LongCookie)
 	}
 
 	render(w, "car.html", car)

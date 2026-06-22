@@ -80,12 +80,12 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 
 	// I had to do this in a funny way due to mutex issue with not passing a pointer.
 	// -----------------
-	recom, err := FetchRecommendations(r)
+	recom, err := FetchRecommendations(w, r)
 
 	if err == nil {
 		data.Recommendations = recom
-
 	}
+
 	// -----------------
 	render(w, "gallery.html", data)
 	//this line is for debugging purposes, to see the query parameters in the console when the gallery page is accessed

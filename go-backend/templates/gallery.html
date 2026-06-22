@@ -9,10 +9,10 @@
         </div>
 
          <!-- Recommendations -->
-        <div class="recommendations" >
+        <div class="recommendations">
+            {{ if .Recommendations }}
             <div class="section-badge">Recommended for you</div>
             <div class="car-grid">
-            {{ if .Recommendations }}
             {{ range .Recommendations }}
             <a href="/car/{{ .CarID }}" class="car-card">
                 <div class="car-card-img-wrap">

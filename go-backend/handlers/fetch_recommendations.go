@@ -43,9 +43,13 @@ func MergeAndReturnUnique(list_1, list_2 []CarSpecs) []CarSpecs {
 	return result
 }
 
-func FetchRecommendations(r *http.Request) ([]CarSpecs, error) {
+func FetchRecommendations(w http.ResponseWriter, r *http.Request) ([]CarSpecs, error) {
 
 	cookieCtx, no_problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
+
+	if cookieCtx.AllowTracking.Value == "false" || cookieCtx.ShortCookie == nil {
+		return nil, errors.New("Failed to read cookies. ")
+	}
 
 	if !no_problem {
 		return nil, errors.New("Failed to read cookies. ")
@@ -127,6 +131,22 @@ func FetchRecommendations(r *http.Request) ([]CarSpecs, error) {
 
 	if len(list1) > RECOMMENDATIONS_MAX_COUNT {
 		list1 = list1[:RECOMMENDATIONS_MAX_COUNT]
+	}
+
+	if cookieCtx.AllowTracking == nil || cookieCtx.AllowTracking.Value == "false" {
+
+		// Check if all cookies needs to be revoked
+		if cookieCtx.DeleteAllCookies {
+			cookies.SetDeleteAllCookiesHeader(w)
+		}
+	}
+
+	if cookieCtx.AllowTracking.Value == "true" {
+		http.SetCookie(w, cookieCtx.ShortCookie)
+	}
+
+	if cookieCtx.ReturnAllCookies {
+		cookies.WriteLongCookieHeader(w, cookieCtx.LongCookie)
 	}
 
 	return list1, nil
