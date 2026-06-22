@@ -6,8 +6,12 @@ import (
 
 const (
 	ANALYTICS_MAX_ROWS  int    = 100_000 // do not start counting large datasets
-	RUN_ANALYTICS       bool   = true    // Enable or disable analytics
 	ANALYTICS_FILE_PATH string = "./suggestions-data.jsonl"
+
+	// After the user has this amount of clicks to a chassis type or car brand,
+	// the program will calculate preferred types.
+	RECOMMENDATIONS_THRESHOLD int    = 2
+	UNDETERMINED_VALUE_NAME   string = "undetermined"
 )
 
 type Entry struct {
@@ -54,8 +58,8 @@ func (self *CookieData) AddEntry(user_long_id, user_short_id, brand, chassis str
 func (self *CookieData) unsafeUpdateCommonMetrics() {
 
 	if len(self.Preferences) == 0 || len(self.Preferences) > ANALYTICS_MAX_ROWS {
-		self.UsualBrand = "Undetermined"
-		self.UsualChassis = "Undetermined"
+		self.UsualBrand = UNDETERMINED_VALUE_NAME
+		self.UsualChassis = UNDETERMINED_VALUE_NAME
 		return
 	}
 
@@ -71,22 +75,31 @@ func (self *CookieData) unsafeUpdateCommonMetrics() {
 		}
 	}
 
-	maxBrand, maxBrandCount := "Undetermined", 0
+	maxBrand, maxBrandCount := UNDETERMINED_VALUE_NAME, 0
 	for key, value := range brandCounter {
 		if value > maxBrandCount {
 			maxBrand, maxBrandCount = key, value
 		}
 	}
 
-	maxChassis, maxChassisCount := "Undetermined", 0
+	maxChassis, maxChassisCount := UNDETERMINED_VALUE_NAME, 0
 	for key, value := range chassisCounter {
 		if value > maxChassisCount {
 			maxChassis, maxChassisCount = key, value
 		}
 	}
 
-	self.UsualBrand = maxBrand
-	self.UsualChassis = maxChassis
+	if maxBrandCount >= RECOMMENDATIONS_THRESHOLD {
+		self.UsualBrand = maxBrand
+	} else {
+		self.UsualBrand = UNDETERMINED_VALUE_NAME
+	}
+
+	if maxChassisCount >= RECOMMENDATIONS_THRESHOLD {
+		self.UsualChassis = maxChassis
+	} else {
+		self.UsualChassis = UNDETERMINED_VALUE_NAME
+	}
 }
 
 var LiveCookieData, _ = LoadAndAggregate(ANALYTICS_FILE_PATH)

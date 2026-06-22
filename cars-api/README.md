@@ -35,6 +35,8 @@ The api exposes the following endpoints:
 ```
 GET /api/models
 GET /api/models/{id}
+GET /api/models/brand{brand}
+GET /api/models/chassis{chassis}
 GET /api/manufacturers
 GET /api/manufacturers/{id}
 GET /api/categories

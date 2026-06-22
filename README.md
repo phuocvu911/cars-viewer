@@ -48,10 +48,18 @@ The filter bar send `GET` request to `/gallery` with data as query parameters. T
 
 ## Comparision Feature
 Selecting cars and clicking ``Compare`` button sends `GET /compare` with selected IDs to retrieve detailed information about those cars for side-by-side comparison.
+
+
 ## Recommendation Feature
 
+The recommendation feature is based on cookies saved to the client. The website recommends cars to the user based on the most clicked car brand as well as the most clicked chassis type. Clicking lots of sedan audis will give you also bmw sedans as a result. Then if you visit lots of Ford ads on the site, the website might also recommend e.g. Ford pickup trucks.
+
+*The user needs visit accumulate 2 same brands or 2 same chassis types to start receiving recommendations, with the default settings.* 
+
+The cookie flow is made in combination with the browser and the backend. The browser prompts for the cookies if it doesn't contain a right named cookie set as "true" or as "false". If the requests made to the backend contains invalid data, the cookies will be deleted and the consent will be prompted again. The website does not have any registry for the cookies given to the clients so verifying the cookie values is basically just that the contains text. (due to validating cookies is out of scope for this project)
+
 ## Store Analytics 
-Some data analytics about the cars that we have in the store.
+Some data analytics about the cars that we have in the store. 
 
 ## Auto Refreshing Data
 

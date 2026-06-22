@@ -12,7 +12,7 @@ func GenerateCookie(lenght int) string {
 		func() {
 			for j := 0; j < 4; j++ {
 				// Returns random letters between byte value 97 and 122 (a - z)
-				out += string(byte(rand.IntN(122-97) + 97))
+				out += string(byte(rand.IntN(123-97) + 97))
 			}
 			out += "-"
 

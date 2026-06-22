@@ -10,9 +10,11 @@ import (
 type CookieCtxKey struct{}
 
 type CookieCtx struct {
-	AllowTracking *http.Cookie
-	ShortCookie   *http.Cookie
-	LongCookie    *http.Cookie
+	AllowTracking    *http.Cookie
+	ShortCookie      *http.Cookie
+	LongCookie       *http.Cookie
+	ReturnAllCookies bool // Used in a case where allow cookies was true but long cookie was not
+	DeleteAllCookies bool // Used in a case where allow cookies was not ok in general. It will quietly remove cookies, but the user will be prompted again for allowance.
 }
 
 // Parses cookies from the request headers. Cookie Context is ONLY used for tracking purposes.

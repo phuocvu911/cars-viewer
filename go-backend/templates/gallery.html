@@ -8,6 +8,28 @@
             <p class="section-subtitle">Browse our curated collection of premium vehicles</p>
         </div>
 
+         <!-- Recommendations -->
+        <div class="recommendations">
+            {{ if .Recommendations }}
+            <div class="section-badge">Recommended for you</div>
+            <div class="car-grid">
+            {{ range .Recommendations }}
+            <a href="/car/{{ .CarID }}" class="car-card">
+                <div class="car-card-img-wrap">
+                    <img class="car-card-img" src="/api/images/{{ .ImgSrc }}" alt="{{ .MakeModel }}" loading="lazy">
+                </div>
+                <div class="car-card-body">
+                    <div class="car-card-brand">{{ .MakeModel }}</div>
+                </div>
+                <div class="car-card-footer">
+                    <span class="car-card-year">{{ .Year }}</span>
+                </div>
+            </a>
+            {{ end }}
+            {{ end }}
+            </div>
+        </div>
+
         <!-- Filter Bar -->
         <form method="GET" action="/gallery" class="filters-bar">
             <div class="search-box">
