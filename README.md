@@ -52,6 +52,8 @@ Selecting cars and clicking ``Compare`` button sends `GET /compare` with selecte
 
 ## Recommendation Feature
 
+This feature embedded into of Gallery page.For the first time user, clicking on some cars and then refreshing the gallery page will show the recommendation section.
+
 The recommendation feature is based on cookies saved to the client. The website recommends cars to the user based on the most clicked car brand as well as the most clicked chassis type. Clicking lots of sedan audis will give you also bmw sedans as a result. Then if you visit lots of Ford ads on the site, the website might also recommend e.g. Ford pickup trucks.
 
 *The user needs visit accumulate 2 same brands or 2 same chassis types to start receiving recommendations, with the default settings.* 
