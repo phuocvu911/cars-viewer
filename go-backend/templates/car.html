@@ -1,25 +1,71 @@
 {{ define "content" }}
-<div id="car-div" class="main-content">
+<section class="section car-section">
+    <div class="section-container">
 
-    <h2 id="content-header">{{.DataPerID.MakeModel}} {{.DataPerID.Year}} </h2>
+        <a href="/gallery" class="car-back-link"><span>←</span> Back to Gallery</a>
 
-    <img src="{{.DataPerID.ImgSrc}}" alt="Picture of a car" height="35%">
+        <div class="car-hero">
+            <div class="car-showcase">
+                <span class="car-showcase-glow"></span>
+                <img class="car-showcase-img" src="{{ .DataPerID.ImgSrc }}" alt="{{ .DataPerID.MakeModel }}">
+                <span class="car-showcase-badge">{{ .Category.Name }}</span>
+            </div>
 
-    <h3 id="content-header">{{.Category.Name}}</h3>
+            <div class="car-info">
+                <div class="section-badge">{{ .ManufactDetails.Name }}</div>
+                <h1 class="car-title"><span class="hero-gradient-text">{{ .DataPerID.MakeModel }}</span></h1>
+                <div class="car-year">{{ .DataPerID.Year }}</div>
 
-    <ul id="specifications">
-        <h2>Specifications</h2>
-        <h3>Engine: {{.DataPerID.TechnicalDetails.Engine}}</h3>
-        <h3>Horsepower: {{.DataPerID.TechnicalDetails.Horsepower}}</h3>
-        <h3>Transmission: {{.DataPerID.TechnicalDetails.Transmission}}</h3>
-        <h3>Drivetrain: {{.DataPerID.TechnicalDetails.Drivetrain}}</h3>
-    </ul>
+                <div class="car-highlight">
+                    <span class="car-highlight-icon">⚡</span>
+                    <div>
+                        <div class="car-highlight-value">{{ .DataPerID.TechnicalDetails.Horsepower }} HP</div>
+                        <div class="car-highlight-label">Horsepower</div>
+                    </div>
+                </div>
 
-    <ul id="about-manufacturer">
-        <h2>About {{.ManufactDetails.Name}}</h2>
-        <h3>{{.ManufactDetails.Name}} was founded in {{.ManufactDetails.CountryOfOrigin}} in
-            {{.ManufactDetails.FoundingYear}}</h3>
-    </ul>
+                <div class="car-actions">
+                    <a href="/gallery" class="btn btn-secondary">Browse More</a>
+                    <a href="/compare" class="btn btn-primary"><span>Compare</span><span class="btn-arrow">→</span></a>
+                </div>
+            </div>
+        </div>
 
-</div>
-{{end}}
+        <h2 class="car-section-heading">Specifications</h2>
+        <div class="car-specs-grid">
+            <div class="spec-card">
+                <div class="spec-card-icon">🔧</div>
+                <div class="spec-card-label">Engine</div>
+                <div class="spec-card-value">{{ .DataPerID.TechnicalDetails.Engine }}</div>
+            </div>
+            <div class="spec-card">
+                <div class="spec-card-icon">⚡</div>
+                <div class="spec-card-label">Horsepower</div>
+                <div class="spec-card-value">{{ .DataPerID.TechnicalDetails.Horsepower }} HP</div>
+            </div>
+            <div class="spec-card">
+                <div class="spec-card-icon">⚙️</div>
+                <div class="spec-card-label">Transmission</div>
+                <div class="spec-card-value">{{ .DataPerID.TechnicalDetails.Transmission }}</div>
+            </div>
+            <div class="spec-card">
+                <div class="spec-card-icon">🛞</div>
+                <div class="spec-card-label">Drivetrain</div>
+                <div class="spec-card-value">{{ .DataPerID.TechnicalDetails.Drivetrain }}</div>
+            </div>
+        </div>
+
+        <div class="car-manufacturer-card">
+            <div class="car-manufacturer-icon">🏭</div>
+            <div class="car-manufacturer-content">
+                <h2 class="car-section-heading">About {{ .ManufactDetails.Name }}</h2>
+                <p class="car-manufacturer-text">
+                    {{ .ManufactDetails.Name }} was founded in {{ .ManufactDetails.CountryOfOrigin }} in
+                    {{ .ManufactDetails.FoundingYear }}.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+{{ end }}
