@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"cars-viewer/cookies"
+	"cars-viewer/models"
 	"net/http"
 	"sync"
 )
@@ -20,7 +21,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var car Car
+	var car models.Car
 
 	errChannel := make(chan error, 1)
 

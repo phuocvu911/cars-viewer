@@ -3,6 +3,7 @@ package handlers
 import (
 	"cars-viewer/analytics"
 	"cars-viewer/cookies"
+	"cars-viewer/models"
 	"errors"
 	"math/rand/v2"
 	"net/http"
@@ -13,7 +14,7 @@ const (
 	RECOMMENDATIONS_MAX_COUNT int = 3
 )
 
-func MergeAndReturnUnique(list_1, list_2 []CarSpecs) []CarSpecs {
+func MergeAndReturnUnique(list_1, list_2 []models.CarSpecs) []models.CarSpecs {
 	idsInList1 := make(map[int]bool)
 	idsInList2 := make(map[int]bool)
 
@@ -24,7 +25,7 @@ func MergeAndReturnUnique(list_1, list_2 []CarSpecs) []CarSpecs {
 		idsInList2[car.CarID] = true
 	}
 
-	var result []CarSpecs
+	var result []models.CarSpecs
 
 	for _, car := range list_1 {
 		result = append(result, car)
@@ -43,7 +44,7 @@ func MergeAndReturnUnique(list_1, list_2 []CarSpecs) []CarSpecs {
 	return result
 }
 
-func FetchRecommendations(w http.ResponseWriter, r *http.Request) ([]CarSpecs, error) {
+func FetchRecommendations(w http.ResponseWriter, r *http.Request) ([]models.CarSpecs, error) {
 
 	cookieCtx, no_problem := r.Context().Value(cookies.CookieCtxKey{}).(cookies.CookieCtx)
 
@@ -70,7 +71,7 @@ func FetchRecommendations(w http.ResponseWriter, r *http.Request) ([]CarSpecs, e
 	}
 
 	var wg sync.WaitGroup
-	var list1, list2 []CarSpecs
+	var list1, list2 []models.CarSpecs
 	var get_brands, get_chassis bool
 	var threads int
 
@@ -94,7 +95,7 @@ func FetchRecommendations(w http.ResponseWriter, r *http.Request) ([]CarSpecs, e
 
 		wg.Go(
 			func() {
-				var tmp []CarSpecs
+				var tmp []models.CarSpecs
 				err := fetchDataFromAPI(MODELS__BY_CHASSIS_ROUTE+user_preferred_chassis, &tmp)
 				if err == nil {
 					list1 = tmp
@@ -107,7 +108,7 @@ func FetchRecommendations(w http.ResponseWriter, r *http.Request) ([]CarSpecs, e
 
 		wg.Go(
 			func() {
-				var tmp []CarSpecs
+				var tmp []models.CarSpecs
 				err := fetchDataFromAPI(MODELS__BY_BRAND_ROUTE+user_preferred_brand, &tmp)
 				if err == nil {
 					list2 = tmp

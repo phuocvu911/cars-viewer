@@ -3,6 +3,7 @@ package handlers
 import (
 	"cars-viewer/analytics"
 	"cars-viewer/cookies"
+	"cars-viewer/models"
 	"context"
 	"encoding/json"
 	"errors"
@@ -29,7 +30,7 @@ const (
 )
 
 // Add tracking data to the file
-func AddTrackingItem(cookie_input *cookies.CookieCtx, car_obj *Car) error {
+func AddTrackingItem(cookie_input *cookies.CookieCtx, car_obj *models.Car) error {
 
 	// Check if any cookie is missing
 	if cookie_input.AllowTracking == nil || cookie_input.LongCookie == nil || cookie_input.ShortCookie == nil {
@@ -51,63 +52,7 @@ func AddTrackingItem(cookie_input *cookies.CookieCtx, car_obj *Car) error {
 
 }
 
-// Global store for all models and categories
-type DataStore struct {
-	Manufacturers []Manufacturer `json:"manufacturers"`
-	Categories    []Category     `json:"categories"`
-	CarModels     []CarModel     `json:"carModels"`
-}
-
-var store DataStore
-
-type CarModel struct {
-	ID             int              `json:"id"`
-	Name           string           `json:"name"`
-	ManufacturerID int              `json:"manufacturerId"`
-	CategoryID     int              `json:"categoryId"`
-	Year           int              `json:"year"`
-	Image          string           `json:"image"`
-	Specifications TechnicalDetails `json:"specifications"`
-}
-
-type Category struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-// DATA STRUCTS
-type Car struct {
-	DataPerID       CarSpecs
-	ManufactDetails Manufacturer
-	Page            string
-	Category        Category
-}
-
-// Access via /api/manufacturers/{id}
-type Manufacturer struct {
-	ID              int    `json:"id"`
-	Name            string `json:"name"`
-	CountryOfOrigin string `json:"country"`
-	FoundingYear    int    `json:"foundingYear"`
-}
-
-type TechnicalDetails struct {
-	Engine       string `json:"engine"`
-	Horsepower   int    `json:"horsepower"`
-	Transmission string `json:"transmission"`
-	Drivetrain   string `json:"drivetrain"`
-}
-
-// Access via /api/models/{id}
-type CarSpecs struct {
-	CarID            int              `json:"id"`             // The cars own individual unique id
-	ManufactrurerID  int              `json:"manufacturerId"` // Holds data to the car manufacturer
-	CategoryID       int              `json:"categoryId"`
-	MakeModel        string           `json:"name"` // e.g. "Audi Q5"
-	Year             int              `json:"year"`
-	TechnicalDetails TechnicalDetails `json:"specifications"`
-	ImgSrc           string           `json:"image"`
-}
+var store models.DataStore
 
 func FetchDataFromAPIByRouteAndID(route string, id int, DataModel any) error {
 
@@ -136,7 +81,7 @@ func FetchDataFromAPIByRouteAndID(route string, id int, DataModel any) error {
 
 // Use to fetch Car by id.
 // Basically fetch CarSpecs struct.
-func FetchCarByID(car_id string, errChan chan<- error, carpointer *Car) {
+func FetchCarByID(car_id string, errChan chan<- error, carpointer *models.Car) {
 
 	int_id, err := strconv.Atoi(car_id)
 
@@ -157,7 +102,7 @@ func FetchCarByID(car_id string, errChan chan<- error, carpointer *Car) {
 
 // Used for enriching Car object concurrently with FetchCarCategory
 // No need to use sync.Mutex
-func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
+func FetchCarManufacturer(errChan chan<- error, carpointer *models.Car) {
 
 	if carpointer.DataPerID.ManufactrurerID < 1 {
 		errChan <- errors.New("Manufactrurer ID has not been assigned or is invalid. ")
@@ -177,7 +122,7 @@ func FetchCarManufacturer(errChan chan<- error, carpointer *Car) {
 
 // Used for enriching Car object concurrently with FetchCarManufacturer
 // No need to use sync.Mutex
-func FetchCarCategory(errChan chan<- error, carpointer *Car) {
+func FetchCarCategory(errChan chan<- error, carpointer *models.Car) {
 
 	if carpointer.DataPerID.CategoryID < 1 {
 		errChan <- errors.New("Category ID has not been assigned or is invalid. ")
@@ -200,14 +145,14 @@ var mu sync.RWMutex
 // Initialize the store by fetching all models and categories
 func InitStore() error {
 	var (
-		models        []CarModel
-		categories    []Category
-		manufacturers []Manufacturer
+		carModels     []models.CarModel
+		categories    []models.Category
+		manufacturers []models.Manufacturer
 	)
 
 	errChan := make(chan error, 3)
 	go func() {
-		errChan <- fetchDataFromAPI(MODELS_ROUTE, &models)
+		errChan <- fetchDataFromAPI(MODELS_ROUTE, &carModels)
 	}()
 	go func() {
 		errChan <- fetchDataFromAPI(CATEGORIES_ROUTE, &categories)
@@ -223,7 +168,7 @@ func InitStore() error {
 
 	//lock and update the store with new data when refreshing to prevent data race
 	mu.Lock()
-	store.CarModels = models
+	store.CarModels = carModels
 	store.Categories = categories
 	store.Manufacturers = manufacturers
 	buildDerived() //rebuild the derived data after updating the store
