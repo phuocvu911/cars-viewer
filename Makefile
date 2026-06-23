@@ -1,11 +1,3 @@
-.PHONY: run api backend
-
-api:
-	cd cars-api && make build && make run
-
-backend:
-	cd go-backend && go run main.go
-
 run:
 	@trap 'kill 0' EXIT INT TERM; \
 	echo "Building and starting API (:3000)..."; \
