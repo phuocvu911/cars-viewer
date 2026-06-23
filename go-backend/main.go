@@ -38,10 +38,6 @@ func main() {
 	mux.Handle("GET /gallery", cookies.AddCookieContext(http.HandlerFunc(handlers.GalleryHandler)))
 	mux.Handle("GET "+handlers.LOCAL_CARS_ROUTE, cookies.AddCookieContext(http.HandlerFunc(handlers.CarDetailsHandler)))
 
-	// file server
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
 	// Proxy image requests to localhost:3000
 	remoteURL, _ := url.Parse(handlers.API_BASE_URL)
 	proxy := httputil.NewSingleHostReverseProxy(remoteURL)

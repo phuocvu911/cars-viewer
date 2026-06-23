@@ -1,22 +1,15 @@
 package handlers
 
 import (
+	"cars-viewer/models"
 	"net/http"
 	"strconv"
 )
 
-type EnrichedCarModel struct {
-	CarModel
-	ManufacturerName    string
-	ManufacturerCountry string
-	FoundingYear        int
-	CategoryName        string
-}
-
 type CompareData struct {
 	Page                       string
-	AllModels                  []CarModel
-	Cars                       []EnrichedCarModel
+	AllModels                  []models.CarModel
+	Cars                       []models.EnrichedCarModel
 	MaxHP, MaxYear             int
 	HasResults, FilterReceived bool
 }

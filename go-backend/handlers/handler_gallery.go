@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"cars-viewer/models"
 	"net/http"
 	"strconv"
 	"strings"
@@ -8,20 +9,20 @@ import (
 
 type GalleryData struct {
 	Page                             string
-	Models                           []EnrichedCarModel
-	Categories                       []Category
-	Manufacturers                    []Manufacturer
+	Models                           []models.EnrichedCarModel
+	Categories                       []models.Category
+	Manufacturers                    []models.Manufacturer
 	Drivetrains, Years               []string
 	Query, CatF, MfgF, YearF, DriveF string
 	ResultCount                      int
-	Recommendations                  []CarSpecs
+	Recommendations                  []models.CarSpecs
 }
 
 func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	mu.RLock()
 	defer mu.RUnlock()
 
-	models := derived.EnrichedModels
+	enrichedModels := derived.EnrichedModels
 	q := r.URL.Query()
 	catF := q.Get("category")
 	mfgF := q.Get("manufacturer")
@@ -33,9 +34,9 @@ func GalleryHandler(w http.ResponseWriter, r *http.Request) {
 	mfgID, hasMfg := atoiOK(mfgF)
 	yearV, hasYear := atoiOK(yearF)
 
-	filtered := make([]EnrichedCarModel, 0, len(models))
+	filtered := make([]models.EnrichedCarModel, 0, len(enrichedModels))
 
-	for _, m := range models {
+	for _, m := range enrichedModels {
 		if hasCat && m.CategoryID != catID {
 			continue
 		}
