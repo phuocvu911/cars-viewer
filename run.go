@@ -7,8 +7,10 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"sync"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -18,8 +20,12 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
-	carsAPI := exec.CommandContext(ctx, "node", "cars-api/main.js")
-	goBack := exec.CommandContext(ctx, "go", "run", "./go-backend/main.go")
+	carsAPI := exec.CommandContext(ctx, "node", "main.js")
+	goBack := exec.CommandContext(ctx, "go", "run", ".")
+
+	home, _ := os.Getwd()
+	goBack.Dir = filepath.Join(home, "/go-backend")
+	carsAPI.Dir = filepath.Join(home, "/cars-api")
 
 	carsAPI.Stdout = os.Stdout
 	carsAPI.Stderr = os.Stderr
@@ -39,6 +45,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		fmt.Println("Starting Go backend...")
+		time.Sleep(time.Second * 2)
 		if err := goBack.Run(); err != nil {
 			log.Println("Go backend error:", err)
 			cancel()
@@ -47,4 +54,5 @@ func main() {
 	}()
 
 	wg.Wait()
+	log.Println()
 }
