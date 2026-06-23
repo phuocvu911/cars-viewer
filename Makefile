@@ -1,4 +1,4 @@
-.PHONY: dev api backend
+.PHONY: run api backend
 
 api:
 	cd cars-api && make build && make run
@@ -6,7 +6,7 @@ api:
 backend:
 	cd go-backend && go run main.go
 
-dev:
+run:
 	@trap 'kill 0' EXIT INT TERM; \
 	echo "Building and starting API (:3000)..."; \
 	(cd cars-api && make build && make run) & \
