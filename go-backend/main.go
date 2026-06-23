@@ -28,9 +28,10 @@ func main() {
 
 	// Serving css file and hooking up the handlers
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	mux.HandleFunc("/", handlers.HomeHandler)
+	mux.HandleFunc("GET /{$}", handlers.HomeHandler)
 	mux.HandleFunc("GET /compare", handlers.CompareHandler)
 	mux.HandleFunc("GET /stats", handlers.StatsHandler)
+	mux.HandleFunc("/", handlers.NotFoundHandler)
 
 	// Cookie-related
 	mux.HandleFunc("GET /allow-cookies", handlers.AllowedCookiesHandler)

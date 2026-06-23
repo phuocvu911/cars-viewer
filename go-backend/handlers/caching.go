@@ -95,7 +95,7 @@ func InitTemplates() {
 		"itoa": strconv.Itoa,
 	}
 
-	pages := []string{"home.html", "gallery.html", "car.html", "compare.html", "stats.html"}
+	pages := []string{"home.html", "gallery.html", "car.html", "compare.html", "stats.html", "404.html"}
 	for _, page := range pages {
 		templates[page] = template.Must(template.New(page).Funcs(funcMap).ParseFiles(
 			"templates/index.html",
