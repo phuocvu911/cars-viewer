@@ -1,20 +1,18 @@
+# TODO 
+
+- Create a 404 page
+- Logic for validating illegal paths 
+
+
+# Requirements
+
+- Go 1.26+
+
+- Node 24+
+
+- NPM 11+ (included with node 24)
+
 # Run project from root 
-
-```bash 
-go run run.go 
-```
-
-It is a startup script for the JS server as well as the go program. If either fails, the project will shut down. 
-
-# Task Split
-
-Hoang does the `:8080/` root and Markus does `/car/{id}` page. 
-
-Hoang do `/compare`.
-
-Hoang go on with `/gallery` page with search option and advanced filter while Markus do `/recommendation`.
-
-# Run the project 
 
 ## Clone the project
 
@@ -22,18 +20,22 @@ Hoang go on with `/gallery` page with search option and advanced filter while Ma
 git clone https://gitea.kood.tech/hoangphuocvu/viewer
 cd viewer
 ```
+## Start the Servers
 
-## Run api server
+API server:
+
 ```bash 
-make api
+cd cars-api && make build && make run
 ```
 
-## Run Go backend server
-Open the new terminal. On the new terminal:
-```bash 
-make run
-```
+On the new terminal:
 
+Backend server
+
+```bash 
+cd go-backend && go run main.go
+```
+:8080 write more.
 # Overview
 ...
 
