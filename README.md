@@ -93,3 +93,6 @@ Some data analytics about the cars that we have in the store.
 ## Auto Refreshing Data
 
 There is a `go routines` that running in the background to update the cars data every 10 minutes. The user can see the latest data when they refresh the page.
+
+## 404 Page
+The 404 page is a simple soft landing page that shows the user that the page they are looking for does not exist. The user can click the button to go back to the home page.
