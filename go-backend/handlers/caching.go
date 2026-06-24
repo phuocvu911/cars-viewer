@@ -41,7 +41,7 @@ func InitStore() error {
 			return err
 		}
 	}
-
+	close(errChan)
 	//lock and update the store with new data when refreshing to prevent data race
 	mu.Lock()
 	store.CarModels = carModels
