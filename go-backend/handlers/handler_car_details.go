@@ -17,7 +17,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	car_id_str := r.URL.Path[len(LOCAL_CARS_ROUTE):]
 	car_id, err := strconv.Atoi(car_id_str)
-	if err != nil || car_id < 0 || car_id > 10 {
+	if err != nil || car_id < 0 {
 		NotFoundHandler(w, r)
 		return
 	}
@@ -64,7 +64,8 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for errors
 	for err := range errChannel {
 		if err != nil {
-			http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
+			NotFoundHandler(w, r)
+			// http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
