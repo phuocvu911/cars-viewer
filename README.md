@@ -1,9 +1,3 @@
-# TODO 
-
-- Create a 404 page
-- Logic for validating illegal paths 
-
-
 # Requirements
 
 - Go 1.26+
@@ -12,7 +6,7 @@
 
 - NPM 11+ (included with node 24)
 
-# Run project from root 
+# Run the project
 
 ## Clone the project
 
