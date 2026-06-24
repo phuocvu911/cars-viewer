@@ -4,6 +4,7 @@ import (
 	"cars-viewer/cookies"
 	"cars-viewer/models"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -14,10 +15,10 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	car_id := r.URL.Path[len(LOCAL_CARS_ROUTE):]
-
-	if len(car_id) == 0 || len(car_id) > 10 {
-		http.Error(w, "Bad request.", http.StatusBadRequest)
+	car_id_str := r.URL.Path[len(LOCAL_CARS_ROUTE):]
+	car_id, err := strconv.Atoi(car_id_str)
+	if err != nil || car_id < 0 {
+		NotFoundHandler(w, r)
 		return
 	}
 
@@ -25,7 +26,7 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	errChannel := make(chan error, 1)
 
-	FetchCarByID(car_id, errChannel, &car)
+	FetchCarByID(car_id_str, errChannel, &car)
 
 	if err := <-errChannel; err != nil {
 		http.Error(w, "Failed to fetch backend data: "+err.Error(), http.StatusInternalServerError)
@@ -63,7 +64,8 @@ func CarDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for errors
 	for err := range errChannel {
 		if err != nil {
-			http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
+			NotFoundHandler(w, r)
+			// http.Error(w, "Failed to fetch car related data: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
